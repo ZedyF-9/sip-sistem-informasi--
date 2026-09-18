@@ -24,7 +24,6 @@
                 ['Buat Surat Keluar', 'surat-keluar.create', []],
                 ['Nomor Resmi', 'tu.nomor-resmi.index', []],
                 ['Arsip Surat Keluar', 'surat-keluar.index', ['status' => 'dikirim']],
-                ['Laporan Persuratan', 'laporan.index', []],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
                 ['Mitra dan Kerja Sama', 'tu.mitra.index', []],
                 ['Kegiatan dan Sertifikat', 'tu.kegiatan.index', []],
@@ -37,7 +36,6 @@
                 ['Buat Disposisi', 'disposisi.create', []],
                 ['Persetujuan Surat Keluar', 'surat-keluar.index', ['status' => 'diajukan']],
                 ['Surat Keluar', 'surat-keluar.index', []],
-                ['Laporan Persuratan', 'laporan.index', []],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
             ],
             default => [

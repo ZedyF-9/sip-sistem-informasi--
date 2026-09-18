@@ -26,13 +26,6 @@
 
             <button class="rounded-xl bg-blue-700 px-5 py-3 text-white">Cari</button>
         </form>
-
-        @if (auth()->user()->role === 'koordinator_tu')
-            <a href="{{ route('surat-keluar.create') }}"
-               class="dashboard-button-create rounded-xl bg-blue-700 px-5 py-3 text-white">
-                + Buat Draf
-            </a>
-        @endif
     </div>
 
     <div tabindex="0" role="region" aria-label="Tabel data, geser untuk melihat seluruh kolom" class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">

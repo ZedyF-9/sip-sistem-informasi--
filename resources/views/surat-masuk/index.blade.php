@@ -8,11 +8,6 @@
         <p class="text-sm text-slate-600">
             Total hasil: {{ $surats->total() }} surat
         </p>
-
-        <a href="{{ route('tu.surat-masuk.create') }}"
-           class="dashboard-button-create rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">
-            + Catat Surat Fisik
-        </a>
     </div>
 
     <form method="GET"
