@@ -24,8 +24,8 @@
         </article>
         <article class="role-summary-stat role-summary-stat-green">
             <p>Mitra Industri</p>
-            <strong aria-label="Data mitra belum tersedia">&mdash;</strong>
-            <span>Belum tersedia</span>
+            <strong>{{ number_format($ringkasan['mitra_industri'], 0, ',', '.') }}</strong>
+            <span>Mitra tercatat</span>
         </article>
     </section>
 

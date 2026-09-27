@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Disposisi;
 use App\Models\Kerjasama;
+use App\Models\MitraIndustri;
 use App\Models\SuratKeluar;
 use App\Models\SuratMasuk;
 use Illuminate\View\View;
@@ -34,6 +35,7 @@ class DashboardController extends Controller
                 'surat_masuk' => $suratMasuk,
                 'surat_keluar' => $suratKeluar,
                 'menunggu_acc' => $menungguAcc,
+                'mitra_industri' => MitraIndustri::query()->count(),
                 'total_surat' => $totalSurat,
                 'persen_acc' => $totalSurat > 0
                     ? round($menungguAcc / $totalSurat * 100, 1) : 0,
@@ -58,6 +60,7 @@ class DashboardController extends Controller
                 'surat_masuk' => $suratDiverifikasi,
                 'surat_keluar' => $suratKeluarDiajukan,
                 'disposisi_aktif' => $disposisiAktif,
+                'mitra_industri' => MitraIndustri::query()->count(),
                 'total_tindakan' => $totalTindakan,
                 'persen_surat' => $totalTindakan > 0
                     ? round($suratDiverifikasi / $totalTindakan * 100, 1) : 0,
@@ -118,7 +121,7 @@ class DashboardController extends Controller
         return view('dashboard', [
             'pengajuanMenunggu' => Kerjasama::query()
                 ->where('status_persetujuan', 'menunggu')->count()
-                + \App\Models\MitraIndustri::query()
+                + MitraIndustri::query()
                     ->where('status_persetujuan', 'menunggu')->count(),
         ]);
     }
