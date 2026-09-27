@@ -1,0 +1,35 @@
+/* SMKN 4: blue shield, red outline and yellow lettering. */
+:root {
+    --school-blue: #0865a6;
+    --school-blue-hover: #064e83;
+    --school-blue-deep: #123957;
+    --school-blue-soft: #edf5fb;
+    --school-red: #c92835;
+    --school-yellow: #f4d52c;
+    --school-line: #d9e5ee;
+    --school-focus: #0865a62b;
+}
+
+.public-header { border-top: 4px solid var(--school-blue); }
+.public-brand .school-logo { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; }
+.public-brand strong { color: var(--school-blue-deep); }
+.public-brand small { color: var(--school-blue); }
+.public-footer > .public-footer-brand { display: flex; align-items: center; gap: 14px; }
+.public-footer-brand img { width: 48px; height: 48px; object-fit: contain; }
+.public-footer-brand strong, .public-footer-brand small { display: block; }
+.public-footer-brand strong { color: var(--school-blue-deep); font-weight: 600; }
+.public-footer-brand small { margin-top: 3px; font-size: 12px; }
+.public-content .public-hero { border-bottom: 3px solid var(--school-blue); }
+.public-hero .dashboard-eyebrow { color: var(--school-blue); font-weight: 600; }
+.public-hero .dashboard-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 3px; margin-right: 10px; vertical-align: middle; background: var(--school-red); }
+.public-guide li > span { background: var(--school-blue-soft); color: var(--school-blue); border-radius: 6px; justify-items: center; flex-basis: 28px; }
+.public-content .public-notice { background: #fffbed; border-left: 4px solid var(--school-yellow); }
+.public-nav-link[aria-current='page'] { box-shadow: inset 0 -2px var(--school-blue); }
+.dashboard-nav a[aria-current='page'], .dashboard-nav a.bg-blue-700 { color: var(--school-blue); background: var(--school-blue-soft); border-color: var(--school-line); }
+.dashboard-sidebar { border-top: 4px solid var(--school-blue); }
+.login-panel { border-top: 4px solid var(--school-blue); }
+.login-wordmark { color: var(--school-blue); }
+
+@media (max-width: 639px) {
+    .public-brand .school-logo { width: 52px; height: 52px; }
+}

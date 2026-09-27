@@ -18,6 +18,10 @@ class Kerjasama extends Model
         'tanggal_selesai',
         'dokumen_mou',
         'status',
+        'status_persetujuan',
+        'catatan_persetujuan',
+        'disetujui_oleh',
+        'disetujui_pada',
     ];
 
     protected function casts(): array
@@ -25,6 +29,7 @@ class Kerjasama extends Model
         return [
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
+            'disetujui_pada' => 'datetime',
         ];
     }
 
@@ -39,6 +44,7 @@ class Kerjasama extends Model
 
         return $query
             ->where('status', 'aktif')
+            ->where('status_persetujuan', 'disetujui')
             ->where('tanggal_mulai', '<=', $hariIni)
             ->where(function (Builder $q) use ($hariIni) {
                 $q->whereNull('tanggal_selesai')

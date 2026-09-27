@@ -10,6 +10,8 @@
            class="rounded-xl bg-blue-700 px-5 py-3 text-white">Edit Mitra</a>
         <a href="{{ route('tu.kerjasama.create', $mitra) }}"
            class="rounded-xl bg-blue-700 px-5 py-3 text-white">+ Tambah Kerja Sama</a>
+        <x-hapus-data :action="route('tu.mitra.destroy', $mitra)" :label="$mitra->nama_mitra"
+            :message="'Hapus mitra '.$mitra->nama_mitra.'? Semua kerja sama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
 
         @if ($mitra->status === 'aktif')
             <a href="{{ route('publik.mitra.show', $mitra) }}"
@@ -32,6 +34,7 @@
         <dl class="mt-6 grid gap-5 md:grid-cols-2">
             @foreach ([
                 'Status publikasi' => ucfirst($mitra->status),
+                'Persetujuan Waka Humas' => ucfirst($mitra->status_persetujuan),
                 'Alamat' => $mitra->alamat,
                 'Telepon' => $mitra->telepon,
                 'Email' => $mitra->email,
@@ -46,6 +49,9 @@
 
         <h3 class="mt-6 font-semibold">Profil publik</h3>
         <p class="mt-3 whitespace-pre-line text-sm leading-7">{{ $mitra->deskripsi }}</p>
+        @if ($mitra->catatan_persetujuan)
+            <p class="mt-4 rounded-xl bg-red-50 p-4 text-sm text-red-800">Catatan penolakan: {{ $mitra->catatan_persetujuan }}</p>
+        @endif
     </section>
 
     <section class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
@@ -57,6 +63,7 @@
                     <th class="p-4">Judul / Nomor MoU</th>
                     <th class="p-4">Periode</th>
                     <th class="p-4">Kondisi</th>
+                    <th class="p-4">Persetujuan</th>
                     <th class="p-4">Aksi</th>
                 </tr>
             </thead>
@@ -74,6 +81,12 @@
                         </td>
                         <td class="p-4">{{ $item->labelPeriode() }}</td>
                         <td class="p-4">
+                            <span class="dashboard-badge" data-status="{{ $item->status_persetujuan }}">{{ ucfirst($item->status_persetujuan) }}</span>
+                            @if ($item->catatan_persetujuan)
+                                <p class="mt-2 max-w-xs text-xs text-red-700">{{ $item->catatan_persetujuan }}</p>
+                            @endif
+                        </td>
+                        <td class="p-4">
                             <a href="{{ route('tu.kerjasama.edit', $item) }}"
                                class="block font-semibold text-blue-700">Edit</a>
                             @if ($item->dokumen_mou)
@@ -86,7 +99,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="p-10 text-center text-slate-500">
+                        <td colspan="5" class="p-10 text-center text-slate-500">
                             Belum ada kerja sama.
                         </td>
                     </tr>

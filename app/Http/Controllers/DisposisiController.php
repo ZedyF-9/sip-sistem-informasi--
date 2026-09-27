@@ -30,7 +30,7 @@ class DisposisiController extends Controller
         $items = Disposisi::query()
             ->with(['surat', 'penerima'])
             ->when(
-                $request->user()->role === 'penerima_disposisi',
+                in_array($request->user()->role, ['penerima_disposisi', 'waka_humas'], true),
                 fn ($query) => $query->where(
                     'penerima_id',
                     $request->user()->id
@@ -56,7 +56,7 @@ class DisposisiController extends Controller
             ->get();
 
         $penerimas = User::query()
-            ->where('role', 'penerima_disposisi')
+            ->whereIn('role', ['penerima_disposisi', 'waka_humas'])
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -87,7 +87,7 @@ class DisposisiController extends Controller
 
             $penerimas = User::query()
                 ->whereIn('id', $penerimaIds)
-                ->where('role', 'penerima_disposisi')
+                ->whereIn('role', ['penerima_disposisi', 'waka_humas'])
                 ->where('is_active', true)
                 ->lockForUpdate()
                 ->get();
@@ -161,7 +161,7 @@ class DisposisiController extends Controller
     public function followUp(Request $request, Disposisi $disposisi)
     {
         abort_unless(
-            $request->user()->role === 'penerima_disposisi'
+            in_array($request->user()->role, ['penerima_disposisi', 'waka_humas'], true)
             && (int) $disposisi->penerima_id === (int) $request->user()->id,
             403
         );
@@ -318,7 +318,7 @@ class DisposisiController extends Controller
             ['koordinator_tu', 'kepala_sekolah'],
             true
         ) || (
-            $user->role === 'penerima_disposisi'
+            in_array($user->role, ['penerima_disposisi', 'waka_humas'], true)
             && (int) $disposisi->penerima_id === (int) $user->id
         );
 

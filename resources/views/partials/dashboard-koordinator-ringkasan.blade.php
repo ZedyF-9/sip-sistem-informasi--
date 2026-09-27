@@ -1,10 +1,9 @@
 <section class="role-summary-dashboard" aria-labelledby="school-summary-title">
     <header class="role-summary-header">
         <div>
-            <p class="role-summary-kicker">Telemetri utama</p>
             <h2 id="school-summary-title">Ringkasan Data Sekolah</h2>
         </div>
-        <p>Angka ditarik langsung dari data operasional saat ini.</p>
+        <p>Jumlah surat dan pengajuan yang tercatat di sekolah.</p>
     </header>
 
     <section class="role-summary-stats" aria-label="Statistik persuratan">
@@ -19,7 +18,7 @@
             <span>Surat tercatat</span>
         </article>
         <article class="role-summary-stat role-summary-stat-amber">
-            <p>Menunggu ACC</p>
+            <p>Menunggu persetujuan</p>
             <strong>{{ number_format($ringkasan['menunggu_acc'], 0, ',', '.') }}</strong>
             <span>Surat keluar diajukan</span>
         </article>
@@ -34,7 +33,6 @@
         <section class="role-summary-panel role-summary-mail-panel" aria-labelledby="latest-mail-title">
             <header class="role-summary-panel-header">
                 <div>
-                    <p class="role-summary-kicker">Arus dokumen</p>
                     <h3 id="latest-mail-title">Surat masuk terbaru</h3>
                     <span>Lima arsip terakhir yang tercatat di sistem.</span>
                 </div>
@@ -82,14 +80,13 @@
 
         <aside class="role-summary-panel role-summary-map" aria-labelledby="operational-map-title">
             <header>
-                <p class="role-summary-kicker">Data pulse</p>
-                <h3 id="operational-map-title">Peta operasional</h3>
+                <h3 id="operational-map-title">Ringkasan persetujuan</h3>
             </header>
 
             <div class="role-summary-pulse">
                 <div class="role-summary-ring" aria-label="{{ $ringkasan['menunggu_acc'] }} antrean ACC">
                     <strong>{{ number_format($ringkasan['menunggu_acc'], 0, ',', '.') }}</strong>
-                    <span>Antrean ACC</span>
+                    <span>Menunggu</span>
                 </div>
                 <div class="role-summary-pulse-copy">
                     <strong>{{ $ringkasan['persen_acc'] }}%</strong>
@@ -113,7 +110,7 @@
             </div>
 
             <a href="{{ route('laporan.index') }}" class="role-summary-report-link">
-                <span><small>Analisis lebih lanjut</small>Buka pusat laporan</span>
+                <span>Lihat laporan</span>
                 <x-dashboard-icon name="arrow" />
             </a>
         </aside>

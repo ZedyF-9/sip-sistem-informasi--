@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 @import './dashboard.css';
+@import './public.css';
+@import './clean-theme.css';
+@import './login.css';
+@import './school-brand.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

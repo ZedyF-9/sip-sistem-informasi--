@@ -22,6 +22,7 @@
                     <th class="p-4">Nama mitra</th>
                     <th class="p-4">Bidang</th>
                     <th class="p-4">Status</th>
+                    <th class="p-4">Persetujuan Waka Humas</th>
                     <th class="p-4">Jumlah kerja sama</th>
                     <th class="p-4">Aksi</th>
                 </tr>
@@ -32,15 +33,18 @@
                         <td class="p-4 font-semibold">{{ $item->nama_mitra }}</td>
                         <td class="p-4">{{ $item->bidang_usaha }}</td>
                         <td class="p-4">{{ ucfirst($item->status) }}</td>
+                        <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan }}">{{ ucfirst($item->status_persetujuan) }}</span></td>
                         <td class="p-4">{{ $item->kerjasamas_count }}</td>
                         <td class="p-4">
                             <a href="{{ route('tu.mitra.show', $item) }}"
                                class="font-semibold text-blue-700">Detail</a>
+                            <x-hapus-data :action="route('tu.mitra.destroy', $item)" :label="$item->nama_mitra"
+                                :message="'Hapus mitra '.$item->nama_mitra.'? Semua kerja sama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="p-10 text-center text-slate-500">
+                        <td colspan="6" class="p-10 text-center text-slate-500">
                             Belum ada mitra yang sesuai.
                         </td>
                     </tr>

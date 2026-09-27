@@ -28,7 +28,7 @@ class StoreDisposisiRequest extends FormRequest
                 'distinct',
                 Rule::exists('users', 'id')->where(
                     fn ($query) => $query
-                        ->where('role', 'penerima_disposisi')
+                        ->whereIn('role', ['penerima_disposisi', 'waka_humas'])
                         ->where('is_active', true)
                 ),
             ],

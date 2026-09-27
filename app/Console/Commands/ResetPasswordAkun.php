@@ -26,6 +26,7 @@ class ResetPasswordAkun extends Command
             ->whereIn('role', [
                 'koordinator_tu',
                 'kepala_sekolah',
+                'waka_humas',
                 'penerima_disposisi',
             ])
             ->orderBy('name')

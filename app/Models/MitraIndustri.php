@@ -19,10 +19,19 @@ class MitraIndustri extends Model
         'logo',
         'deskripsi',
         'status',
+        'status_persetujuan',
+        'catatan_persetujuan',
+        'disetujui_oleh',
+        'disetujui_pada',
     ];
+
+    protected function casts(): array
+    {
+        return ['disetujui_pada' => 'datetime'];
+    }
 
     public function kerjasamas(): HasMany
     {
         return $this->hasMany(Kerjasama::class, 'mitra_industri_id');
     }
-}   
+}

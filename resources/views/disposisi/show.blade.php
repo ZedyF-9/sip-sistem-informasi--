@@ -49,7 +49,7 @@
     </section>
 
     @if (
-        auth()->user()->role === 'penerima_disposisi'
+        in_array(auth()->user()->role, ['penerima_disposisi', 'waka_humas'], true)
         && (int) auth()->id() === (int) $disposisi->penerima_id
         && $disposisi->status !== 'selesai'
     )

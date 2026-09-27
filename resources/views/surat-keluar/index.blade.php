@@ -4,6 +4,14 @@
 
 @section('content')
     <section class="dashboard-data-panel" aria-label="Daftar data">
+    @if (auth()->user()->role === 'koordinator_tu')
+        <div class="mb-6 flex flex-wrap justify-end gap-3">
+            <a href="{{ route('surat-keluar.create') }}"
+               class="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                Buat Surat Keluar
+            </a>
+        </div>
+    @endif
     <div class="mb-6 flex flex-wrap justify-between gap-4">
         <form method="GET" action="{{ route('surat-keluar.index') }}"
               class="dashboard-filter flex flex-wrap gap-3">
@@ -56,6 +64,10 @@
                         <td class="p-4">
                             <a href="{{ route('surat-keluar.show', $item) }}"
                                class="font-semibold text-blue-700">Detail</a>
+                            @if (auth()->user()->role === 'koordinator_tu')
+                                <x-hapus-data :action="route('surat-keluar.destroy', $item)" :label="$item->perihal"
+                                    :message="'Hapus surat keluar '.$item->perihal.'? Riwayat dan berkas terkait ikut dihapus permanen.'" />
+                            @endif
                         </td>
                     </tr>
                 @empty

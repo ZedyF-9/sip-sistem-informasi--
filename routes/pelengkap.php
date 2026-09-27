@@ -5,7 +5,9 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\NomorResmiController;
 use App\Http\Controllers\PerbaikanSuratController;
 use App\Http\Controllers\SertifikatController;
+use App\Http\Controllers\SuratKeluarController;
 use App\Http\Middleware\EnsureInternalAccess;
+use App\Http\Middleware\EnsureSuratKeluarFinal;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/verifikasi-sertifikat', [
@@ -36,6 +38,13 @@ Route::middleware([
         CetakLaporanController::class,
         'index',
     ])->name('laporan.cetak');
+
+    Route::get('/surat-keluar/{suratKeluar}/pdf-final', [
+        NomorResmiController::class,
+        'download',
+    ])
+        ->whereNumber('suratKeluar')
+        ->name('surat-keluar.final.download');
 });
 
 Route::middleware([
@@ -59,15 +68,21 @@ Route::middleware([
 
         Route::get('/kegiatan/{kegiatan}/edit', [
             KegiatanController::class, 'edit',
-        ])->whereNumber('kegiatan')->name('kegiatan.edit');
+        ])
+            ->whereNumber('kegiatan')
+            ->name('kegiatan.edit');
 
         Route::put('/kegiatan/{kegiatan}', [
             KegiatanController::class, 'update',
-        ])->whereNumber('kegiatan')->name('kegiatan.update');
+        ])
+            ->whereNumber('kegiatan')
+            ->name('kegiatan.update');
 
         Route::get('/kegiatan/{kegiatan}', [
             KegiatanController::class, 'show',
-        ])->whereNumber('kegiatan')->name('kegiatan.show');
+        ])
+            ->whereNumber('kegiatan')
+            ->name('kegiatan.show');
 
         Route::post('/kegiatan/{kegiatan}/sertifikat', [
             SertifikatController::class, 'store',
@@ -78,11 +93,15 @@ Route::middleware([
 
         Route::get('/sertifikat/{sertifikat}/download', [
             SertifikatController::class, 'download',
-        ])->whereNumber('sertifikat')->name('sertifikat.download');
+        ])
+            ->whereNumber('sertifikat')
+            ->name('sertifikat.download');
 
         Route::patch('/sertifikat/{sertifikat}/cabut', [
             SertifikatController::class, 'cabut',
-        ])->whereNumber('sertifikat')->name('sertifikat.cabut');
+        ])
+            ->whereNumber('sertifikat')
+            ->name('sertifikat.cabut');
 
         Route::get('/perbaikan-surat', [
             PerbaikanSuratController::class, 'index',
@@ -90,11 +109,15 @@ Route::middleware([
 
         Route::get('/perbaikan-surat/{suratMasuk}', [
             PerbaikanSuratController::class, 'edit',
-        ])->whereNumber('suratMasuk')->name('perbaikan.edit');
+        ])
+            ->whereNumber('suratMasuk')
+            ->name('perbaikan.edit');
 
         Route::put('/perbaikan-surat/{suratMasuk}', [
             PerbaikanSuratController::class, 'update',
-        ])->whereNumber('suratMasuk')->name('perbaikan.update');
+        ])
+            ->whereNumber('suratMasuk')
+            ->name('perbaikan.update');
 
         Route::get('/nomor-resmi', [
             NomorResmiController::class, 'index',
@@ -102,5 +125,26 @@ Route::middleware([
 
         Route::post('/nomor-resmi/{suratKeluar}', [
             NomorResmiController::class, 'store',
-        ])->whereNumber('suratKeluar')->name('nomor-resmi.store');
+        ])
+            ->whereNumber('suratKeluar')
+            ->middleware('throttle:10,1')
+            ->name('nomor-resmi.store');
     });
+
+/*
+|--------------------------------------------------------------------------
+| Hubungkan proses surat keluar lama ke pemeriksaan PDF final.
+|--------------------------------------------------------------------------
+|
+| Pada struktur sebelumnya, routes/persuratan.php sudah dimuat sebelum
+| file ini. Karena itu, route SuratKeluarController sudah terdaftar.
+|
+*/
+
+foreach (Route::getRoutes() as $route) {
+    $action = ltrim($route->getActionName(), '\\');
+
+    if (str_starts_with($action, SuratKeluarController::class.'@')) {
+        $route->middleware(EnsureSuratKeluarFinal::class);
+    }
+}

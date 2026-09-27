@@ -52,7 +52,7 @@ class CreateAllInternalUsers extends Command
             [
                 'name' => 'Waka Humas',
                 'email' => 'waka_humas@smkn4.com',
-                'role' => 'penerima_disposisi',
+                'role' => 'waka_humas',
             ],
             [
                 'name' => 'Pembina OSIS',

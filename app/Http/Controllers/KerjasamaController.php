@@ -26,6 +26,8 @@ class KerjasamaController extends Controller
         unset($data['dokumen_mou']);
 
         $data['mitra_industri_id'] = $mitra->id;
+        $data['status_persetujuan'] = 'menunggu';
+        $data['catatan_persetujuan'] = null;
 
         $path = $this->storeDocument($request);
 
@@ -61,6 +63,10 @@ class KerjasamaController extends Controller
     ) {
         $data = $request->validated();
         unset($data['dokumen_mou']);
+        $data['status_persetujuan'] = 'menunggu';
+        $data['catatan_persetujuan'] = null;
+        $data['disetujui_oleh'] = null;
+        $data['disetujui_pada'] = null;
 
         $path = $this->storeDocument($request);
 

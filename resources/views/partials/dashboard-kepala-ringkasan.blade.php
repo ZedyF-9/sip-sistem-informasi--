@@ -1,7 +1,6 @@
 <section class="role-summary-dashboard" aria-labelledby="school-summary-title">
     <header class="role-summary-header">
         <div>
-            <p class="role-summary-kicker">Panel Kepemimpinan</p>
             <h2 id="school-summary-title">Ringkasan Kerja Kepala Sekolah</h2>
         </div>
         <p>Tinjauan surat masuk, persetujuan draf, dan pemantauan instruksi.</p>
@@ -34,7 +33,6 @@
         <section class="role-summary-panel role-summary-mail-panel" aria-labelledby="latest-mail-title">
             <header class="role-summary-panel-header">
                 <div>
-                    <p class="role-summary-kicker">Verifikasi TU</p>
                     <h3 id="latest-mail-title">Surat perlu disposisi</h3>
                     <span>Arsip yang telah diperiksa TU dan siap Anda teruskan.</span>
                 </div>
@@ -82,8 +80,7 @@
 
         <aside class="role-summary-panel role-summary-map" aria-labelledby="operational-map-title">
             <header>
-                <p class="role-summary-kicker">Beban kerja</p>
-                <h3 id="operational-map-title">Peta persetujuan</h3>
+                <h3 id="operational-map-title">Antrean pekerjaan</h3>
             </header>
 
             <div class="role-summary-pulse">
@@ -92,7 +89,7 @@
                     <span>Tugas</span>
                 </div>
                 <div class="role-summary-pulse-copy">
-                    <strong>Pusat Kendali</strong>
+                    <strong>Perlu ditindaklanjuti</strong>
                     <span>Total surat dan disposisi yang memerlukan perhatian Anda.</span>
                 </div>
             </div>
@@ -107,7 +104,7 @@
                     <div class="role-summary-progress-track"><span class="role-summary-progress-blue" style="width: {{ $ringkasan['persen_surat'] }}%"></span></div>
                 </div>
                 <div class="role-summary-progress-group">
-                    <div><span>Persetujuan ACC</span><strong>{{ $ringkasan['persen_keluar'] }}%</strong></div>
+                    <div><span>Persetujuan surat</span><strong>{{ $ringkasan['persen_keluar'] }}%</strong></div>
                     <div class="role-summary-progress-track"><span class="role-summary-progress-amber" style="width: {{ $ringkasan['persen_keluar'] }}%"></span></div>
                 </div>
                 <div class="role-summary-progress-group">
@@ -117,7 +114,7 @@
             </div>
 
             <a href="{{ route('laporan.index') }}" class="role-summary-report-link">
-                <span><small>Analisis lebih lanjut</small>Buka pusat laporan</span>
+                <span>Lihat laporan</span>
                 <x-dashboard-icon name="arrow" />
             </a>
         </aside>

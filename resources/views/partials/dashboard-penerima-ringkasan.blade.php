@@ -1,7 +1,6 @@
 <section class="role-summary-dashboard" aria-labelledby="school-summary-title">
     <header class="role-summary-header">
         <div>
-            <p class="role-summary-kicker">Panel Pelaksana</p>
             <h2 id="school-summary-title">Ringkasan Tugas Anda</h2>
         </div>
         <p>Pantau disposisi yang diterima dan catat perkembangan pekerjaan.</p>
@@ -34,7 +33,6 @@
         <section class="role-summary-panel role-summary-mail-panel" aria-labelledby="latest-mail-title">
             <header class="role-summary-panel-header">
                 <div>
-                    <p class="role-summary-kicker">Tugas terbaru</p>
                     <h3 id="latest-mail-title">Disposisi masuk</h3>
                     <span>Lima instruksi terakhir yang Anda terima.</span>
                 </div>
@@ -82,8 +80,7 @@
 
         <aside class="role-summary-panel role-summary-map" aria-labelledby="operational-map-title">
             <header>
-                <p class="role-summary-kicker">Produktivitas</p>
-                <h3 id="operational-map-title">Peta pengerjaan</h3>
+                <h3 id="operational-map-title">Status pekerjaan</h3>
             </header>
 
             <div class="role-summary-pulse">
@@ -92,7 +89,7 @@
                     <span>Total</span>
                 </div>
                 <div class="role-summary-pulse-copy">
-                    <strong>Fokus Kerja</strong>
+                    <strong>Tindak lanjut</strong>
                     <span>Tuntaskan tugas baru dan perbarui status pengerjaan secara berkala.</span>
                 </div>
             </div>
@@ -117,7 +114,7 @@
             </div>
 
             <a href="{{ route('disposisi.index') }}" class="role-summary-report-link">
-                <span><small>Kelola tugas</small>Buka daftar disposisi</span>
+                <span>Lihat disposisi</span>
                 <x-dashboard-icon name="arrow" />
             </a>
         </aside>

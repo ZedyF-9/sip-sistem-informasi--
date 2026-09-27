@@ -39,6 +39,7 @@ Route::middleware(['auth', EnsureInternalAccess::class])
             return redirect()->route(match ($request->user()->role) {
                 'koordinator_tu' => 'tu.dashboard',
                 'kepala_sekolah' => 'kepala.dashboard',
+                'waka_humas' => 'waka-humas.dashboard',
                 'penerima_disposisi' => 'penerima.dashboard',
             });
         })->name('dashboard');
@@ -52,6 +53,9 @@ Route::middleware(['auth', EnsureInternalAccess::class])
         Route::get('/penerima/dashboard', [DashboardController::class, 'index'])
             ->middleware(EnsureInternalAccess::class.':penerima_disposisi')
             ->name('penerima.dashboard');
+        Route::get('/waka-humas/dashboard', [DashboardController::class, 'index'])
+            ->middleware(EnsureInternalAccess::class.':waka_humas')
+            ->name('waka-humas.dashboard');
     });
 
 Route::middleware([
@@ -111,10 +115,20 @@ Route::middleware(['auth', EnsureInternalAccess::class])
         ])->whereNumber('lampiran')->name('lampiran');
         Route::post('/{disposisi}/tindak-lanjut', [
             DisposisiController::class, 'followUp',
-        ])->middleware(EnsureInternalAccess::class.':penerima_disposisi')
+        ])->middleware(EnsureInternalAccess::class.':penerima_disposisi,waka_humas')
             ->name('tindak-lanjut');
         Route::get('/{disposisi}', [DisposisiController::class, 'show'])
             ->name('show');
     });
 
 require __DIR__.'/persuratan.php';
+
+Route::middleware(['auth', EnsureInternalAccess::class.':koordinator_tu'])->group(function () {
+    Route::delete('/tu/surat-masuk/{suratMasuk}', [\App\Http\Controllers\HapusDataController::class, 'suratMasuk'])->name('tu.surat-masuk.destroy');
+    Route::delete('/surat-keluar/{suratKeluar}', [\App\Http\Controllers\HapusDataController::class, 'suratKeluar'])->name('surat-keluar.destroy');
+    Route::delete('/tu/kegiatan/{kegiatan}', [\App\Http\Controllers\HapusDataController::class, 'kegiatan'])->name('tu.kegiatan.destroy');
+});
+
+Route::delete('/disposisi/{disposisi}', [\App\Http\Controllers\HapusDataController::class, 'disposisi'])
+    ->middleware(['auth', EnsureInternalAccess::class.':koordinator_tu,kepala_sekolah'])
+    ->name('disposisi.destroy');

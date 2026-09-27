@@ -1,6 +1,6 @@
 @extends('layouts.internal')
 
-@section('title', auth()->user()->role === 'penerima_disposisi'
+@section('title', in_array(auth()->user()->role, ['penerima_disposisi', 'waka_humas'], true)
     ? 'Disposisi Saya'
     : 'Pemantauan Disposisi')
 
@@ -74,6 +74,10 @@
                                class="font-semibold text-blue-700">
                                 Detail
                             </a>
+                            @if (in_array(auth()->user()->role, ['koordinator_tu', 'kepala_sekolah'], true))
+                                <x-hapus-data :action="route('disposisi.destroy', $item)" :label="'disposisi #'.$item->id"
+                                    :message="'Hapus disposisi untuk '.$item->penerima->name.'? Tindak lanjut dan lampirannya ikut dihapus permanen.'" />
+                            @endif
                         </td>
                     </tr>
                 @empty

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Disposisi;
+use App\Models\Kerjasama;
 use App\Models\SuratKeluar;
 use App\Models\SuratMasuk;
 use Illuminate\View\View;
@@ -16,6 +17,7 @@ class DashboardController extends Controller
         return match ($user->role) {
             'koordinator_tu' => $this->tuDashboard(),
             'kepala_sekolah' => $this->kepalaDashboard(),
+            'waka_humas' => $this->wakaHumasDashboard(),
             default => $this->penerimaDashboard(),
         };
     }
@@ -108,6 +110,16 @@ class DashboardController extends Controller
                 ->latest('id')
                 ->limit(5)
                 ->get(),
+        ]);
+    }
+
+    private function wakaHumasDashboard(): View
+    {
+        return view('dashboard', [
+            'pengajuanMenunggu' => Kerjasama::query()
+                ->where('status_persetujuan', 'menunggu')->count()
+                + \App\Models\MitraIndustri::query()
+                    ->where('status_persetujuan', 'menunggu')->count(),
         ]);
     }
 }

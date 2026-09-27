@@ -19,6 +19,7 @@ class MitraPublikController extends Controller
 
         $items = MitraIndustri::query()
             ->where('status', 'aktif')
+            ->where('status_persetujuan', 'disetujui')
             ->select([
                 'id', 'nama_mitra', 'bidang_usaha', 'deskripsi', 'logo',
             ])
@@ -39,6 +40,7 @@ class MitraPublikController extends Controller
     {
         $mitra = MitraIndustri::query()
             ->where('status', 'aktif')
+            ->where('status_persetujuan', 'disetujui')
             ->select([
                 'id', 'nama_mitra', 'bidang_usaha',
                 'deskripsi', 'website', 'logo',
@@ -58,6 +60,7 @@ class MitraPublikController extends Controller
     {
         $mitra = MitraIndustri::query()
             ->where('status', 'aktif')
+            ->where('status_persetujuan', 'disetujui')
             ->findOrFail($mitra);
 
         /** @var FilesystemAdapter $disk */

@@ -44,6 +44,8 @@ class MitraController extends Controller
     {
         $data = $request->validated();
         unset($data['logo']);
+        $data['status_persetujuan'] = 'menunggu';
+        $data['catatan_persetujuan'] = null;
 
         $path = $this->storeLogo($request);
 
@@ -62,7 +64,7 @@ class MitraController extends Controller
         }
 
         return redirect()->route('tu.mitra.show', $mitra)
-            ->with('status', 'Mitra berhasil ditambahkan.');
+            ->with('status', 'Mitra berhasil ditambahkan dan menunggu persetujuan Waka Humas.');
     }
 
     public function show(MitraIndustri $mitra)
@@ -83,6 +85,10 @@ class MitraController extends Controller
     {
         $data = $request->validated();
         unset($data['logo']);
+        $data['status_persetujuan'] = 'menunggu';
+        $data['catatan_persetujuan'] = null;
+        $data['disetujui_oleh'] = null;
+        $data['disetujui_pada'] = null;
 
         $path = $this->storeLogo($request);
 

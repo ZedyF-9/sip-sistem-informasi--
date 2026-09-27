@@ -3,6 +3,7 @@
 use App\Http\Controllers\KerjasamaController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\MitraPublikController;
+use App\Http\Controllers\PersetujuanKerjasamaController;
 use App\Http\Middleware\EnsureInternalAccess;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,23 @@ Route::get('/mitra/{mitra}', [
     ->whereNumber('mitra')
     ->name('publik.mitra.show');
 
+Route::middleware(['auth', EnsureInternalAccess::class.':waka_humas'])
+    ->prefix('waka-humas/kerjasama')
+    ->name('waka-humas.kerjasama.')
+    ->group(function () {
+        Route::get('/', [PersetujuanKerjasamaController::class, 'index'])->name('index');
+        Route::patch('/mitra/{mitra}/setujui', [PersetujuanKerjasamaController::class, 'approveMitra'])
+            ->whereNumber('mitra')->name('mitra.approve');
+        Route::patch('/mitra/{mitra}/tolak', [PersetujuanKerjasamaController::class, 'rejectMitra'])
+            ->whereNumber('mitra')->name('mitra.reject');
+        Route::patch('/{kerjasama}/setujui', [PersetujuanKerjasamaController::class, 'approve'])
+            ->whereNumber('kerjasama')->name('approve');
+        Route::patch('/{kerjasama}/tolak', [PersetujuanKerjasamaController::class, 'reject'])
+            ->whereNumber('kerjasama')->name('reject');
+        Route::get('/{kerjasama}/download', [PersetujuanKerjasamaController::class, 'download'])
+            ->whereNumber('kerjasama')->name('download');
+    });
+
 Route::middleware([
     'auth',
     EnsureInternalAccess::class.':koordinator_tu',
@@ -46,6 +64,10 @@ Route::middleware([
             MitraController::class,
             'store',
         ])->name('mitra.store');
+
+        Route::delete('/mitra/{mitra}', [
+            \App\Http\Controllers\HapusDataController::class, 'mitra',
+        ])->whereNumber('mitra')->name('mitra.destroy');
 
         Route::get('/mitra/{mitra}/edit', [
             MitraController::class,

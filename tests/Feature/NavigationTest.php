@@ -22,6 +22,7 @@ class NavigationTest extends TestCase
             'bidang_usaha' => 'Teknologi',
             'deskripsi' => 'Mitra untuk pengujian navigasi publik.',
             'status' => 'aktif',
+            'status_persetujuan' => 'disetujui',
         ]);
 
         $pages = [
@@ -79,6 +80,7 @@ class NavigationTest extends TestCase
         foreach ([
             'koordinator_tu' => 'tu.dashboard',
             'kepala_sekolah' => 'kepala.dashboard',
+            'waka_humas' => 'waka-humas.dashboard',
             'penerima_disposisi' => 'penerima.dashboard',
         ] as $role => $dashboard) {
             $this->actingAs(User::factory()->create(['role' => $role, 'is_active' => true]));
@@ -104,6 +106,7 @@ class NavigationTest extends TestCase
         foreach ([
             'koordinator_tu' => 'tu.dashboard',
             'kepala_sekolah' => 'kepala.dashboard',
+            'waka_humas' => 'waka-humas.dashboard',
             'penerima_disposisi' => 'penerima.dashboard',
         ] as $role => $dashboard) {
             $this->actingAs(User::factory()->create(['role' => $role, 'is_active' => true]));
@@ -127,21 +130,24 @@ class NavigationTest extends TestCase
         $mitra = MitraIndustri::query()->create([
             'nama_mitra' => 'Mitra Navigasi', 'bidang_usaha' => 'Teknologi', 'status' => 'aktif',
             'deskripsi' => 'Mitra untuk pemeriksaan navigasi.',
+            'status_persetujuan' => 'disetujui',
         ]);
 
         $cases = [
-            ['koordinator_tu', 'tu.surat-masuk.create', [], 'Catat Surat Fisik'],
-            ['koordinator_tu', 'surat-keluar.create', [], 'Buat Surat Keluar'],
+            ['koordinator_tu', 'tu.surat-masuk.create', [], 'Surat Masuk'],
+            ['koordinator_tu', 'surat-keluar.create', [], 'Surat Keluar'],
             ['koordinator_tu', 'surat-keluar.index', ['status' => 'dikirim'], 'Arsip Surat Keluar'],
             ['koordinator_tu', 'surat-keluar.index', ['status' => 'draf'], 'Surat Keluar'],
             ['koordinator_tu', 'tu.mitra.show', [$mitra], 'Mitra dan Kerja Sama'],
             ['koordinator_tu', 'tu.kerjasama.create', [$mitra], 'Mitra dan Kerja Sama'],
             ['koordinator_tu', 'tu.kegiatan.create', [], 'Kegiatan dan Sertifikat'],
-            ['koordinator_tu', 'tu.perbaikan.index', [], 'Perbaiki Surat Masuk'],
+            ['koordinator_tu', 'tu.perbaikan.index', [], 'Surat Masuk'],
             ['koordinator_tu', 'tu.nomor-resmi.index', [], 'Nomor Resmi'],
             ['koordinator_tu', 'laporan.cetak', [], 'Cetak Laporan / PDF'],
             ['kepala_sekolah', 'surat-keluar.index', ['status' => 'diajukan'], 'Persetujuan Surat Keluar'],
-            ['kepala_sekolah', 'disposisi.create', [], 'Buat Disposisi'],
+            ['kepala_sekolah', 'disposisi.create', [], 'Pemantauan Disposisi'],
+            ['waka_humas', 'waka-humas.kerjasama.index', [], 'Persetujuan Mitra dan Kerja Sama'],
+            ['waka_humas', 'disposisi.index', ['status' => 'diproses'], 'Sedang Diproses'],
             ['penerima_disposisi', 'disposisi.index', ['status' => 'diproses'], 'Sedang Diproses'],
             ['penerima_disposisi', 'disposisi.index', ['status' => 'selesai'], 'Disposisi Selesai'],
             ['penerima_disposisi', 'disposisi.index', ['status' => 'baru'], 'Disposisi Saya'],

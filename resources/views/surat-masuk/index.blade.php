@@ -8,6 +8,16 @@
         <p class="text-sm text-slate-600">
             Total hasil: {{ $surats->total() }} surat
         </p>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('tu.perbaikan.index') }}"
+               class="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+                Perbaikan Surat Masuk
+            </a>
+            <a href="{{ route('tu.surat-masuk.create') }}"
+               class="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                Catat Surat Fisik
+            </a>
+        </div>
     </div>
 
     <form method="GET"
@@ -80,6 +90,8 @@
                                class="font-semibold text-blue-700 hover:underline">
                                 Detail
                             </a>
+                            <x-hapus-data :action="route('tu.surat-masuk.destroy', $surat)" :label="$surat->perihal"
+                                :message="'Hapus surat masuk '.$surat->nomor_registrasi.'? Semua disposisi, tindak lanjut, riwayat, dan berkas terkait ikut dihapus permanen.'" />
                         </td>
                     </tr>
                 @empty

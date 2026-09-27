@@ -65,6 +65,12 @@
                             >
                                 Kelola
                             </a>
+                            @if ($kegiatan->sertifikats_count === 0)
+                                <x-hapus-data :action="route('tu.kegiatan.destroy', $kegiatan)" :label="$kegiatan->nama"
+                                    :message="'Hapus agenda/kegiatan '.$kegiatan->nama.' secara permanen?'" />
+                            @else
+                                <p class="mt-2 text-xs text-slate-500">Memiliki sertifikat; tidak dapat dihapus.</p>
+                            @endif
                         </td>
                     </tr>
                 @empty

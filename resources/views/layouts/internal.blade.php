@@ -16,12 +16,9 @@
             'koordinator_tu' => [
                 ['Dashboard', 'tu.dashboard', []],
                 ['Surat Masuk', 'tu.surat-masuk.index', []],
-                ['Catat Surat Fisik', 'tu.surat-masuk.create', []],
-                ['Perbaiki Surat Masuk', 'tu.perbaikan.index', []],
                 ['Antrean Pemeriksaan', 'tu.pemeriksaan.index', []],
                 ['Pemantauan Disposisi', 'disposisi.index', []],
                 ['Surat Keluar', 'surat-keluar.index', []],
-                ['Buat Surat Keluar', 'surat-keluar.create', []],
                 ['Nomor Resmi', 'tu.nomor-resmi.index', []],
                 ['Arsip Surat Keluar', 'surat-keluar.index', ['status' => 'dikirim']],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
@@ -33,10 +30,16 @@
                 ['Dashboard', 'kepala.dashboard', []],
                 ['Surat dari TU', 'kepala.surat.index', []],
                 ['Pemantauan Disposisi', 'disposisi.index', []],
-                ['Buat Disposisi', 'disposisi.create', []],
                 ['Persetujuan Surat Keluar', 'surat-keluar.index', ['status' => 'diajukan']],
                 ['Surat Keluar', 'surat-keluar.index', []],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
+            ],
+            'waka_humas' => [
+                ['Dashboard', 'waka-humas.dashboard', []],
+                ['Persetujuan Mitra dan Kerja Sama', 'waka-humas.kerjasama.index', []],
+                ['Disposisi Saya', 'disposisi.index', []],
+                ['Sedang Diproses', 'disposisi.index', ['status' => 'diproses']],
+                ['Disposisi Selesai', 'disposisi.index', ['status' => 'selesai']],
             ],
             default => [
                 ['Dashboard', 'penerima.dashboard', []],
@@ -59,7 +62,8 @@
                     $module = str_ends_with($routeName, '.index') ? substr($routeName, 0, -6) : null;
                     $matchesPage = request()->routeIs($routeName)
                         || (! $hasExactMenu && $module && request()->routeIs($module.'.*'))
-                        || ($routeName === 'tu.mitra.index' && request()->routeIs('tu.kerjasama.*'));
+                        || ($routeName === 'tu.mitra.index' && request()->routeIs('tu.kerjasama.*'))
+                        || ($routeName === 'tu.surat-masuk.index' && request()->routeIs('tu.perbaikan.*'));
                     $statusMenus = collect($navigation)->where(1, $routeName)->pluck('2.status')->filter()->all();
                     $active = $matchesPage && (isset($parameters['status'])
                         ? request('status') === $parameters['status']
