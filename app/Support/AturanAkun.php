@@ -8,6 +8,7 @@ final class AturanAkun
 {
     public const ROLES = [
         'koordinator_tu' => 'Koordinator TU',
+        'kepala_tu' => 'Kepala TU',
         'kepala_sekolah' => 'Kepala Sekolah',
         'waka_humas' => 'Waka Humas',
         'penerima_disposisi' => 'Penerima Disposisi',

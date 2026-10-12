@@ -3,14 +3,14 @@
         <div>
             <h2 id="school-summary-title">Ringkasan Kerja Kepala Sekolah</h2>
         </div>
-        <p>Tinjauan surat masuk, persetujuan draf, dan pemantauan instruksi.</p>
+        <p>Tinjau disposisi yang diajukan TU sebelum instruksi menjadi aktif.</p>
     </header>
 
     <section class="role-summary-stats" aria-label="Statistik operasional">
         <article class="role-summary-stat role-summary-stat-blue">
-            <p>Surat dari TU</p>
+            <p>Persetujuan Disposisi</p>
             <strong>{{ number_format($ringkasan['surat_masuk'], 0, ',', '.') }}</strong>
-            <span>Menunggu disposisi</span>
+            <span>Pengajuan dari TU</span>
         </article>
         <article class="role-summary-stat role-summary-stat-amber">
             <p>Persetujuan Surat</p>
@@ -33,10 +33,10 @@
         <section class="role-summary-panel role-summary-mail-panel" aria-labelledby="latest-mail-title">
             <header class="role-summary-panel-header">
                 <div>
-                    <h3 id="latest-mail-title">Surat perlu disposisi</h3>
-                    <span>Arsip yang telah diperiksa TU dan siap Anda teruskan.</span>
+                    <h3 id="latest-mail-title">Antrean Disposisi dari TU</h3>
+                    <span>Tinjau pengajuan, lalu isi lembar disposisi resmi setelah menyetujuinya.</span>
                 </div>
-                <a href="{{ route('kepala.surat.index') }}" class="role-summary-view-all">
+                <a href="{{ route('disposisi.index') }}" class="role-summary-view-all">
                     Lihat semua <x-dashboard-icon name="arrow" />
                 </a>
             </header>
@@ -47,20 +47,20 @@
                     <thead>
                         <tr>
                             <th>Nomor surat</th>
-                            <th>Asal</th>
-                            <th>Tanggal</th>
+                            <th>Perihal</th>
+                            <th>Diajukan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($suratTerbaru as $surat)
                         <tr>
-                            <td>{{ $surat->nomor_surat ?: $surat->nomor_registrasi }}</td>
-                            <td>{{ $surat->asal_surat }}</td>
-                            <td>{{ $surat->tanggal_surat->format('d/m/Y') }}</td>
+                            <td>{{ $surat->surat->nomor_surat ?: $surat->surat->nomor_registrasi }}</td>
+                            <td>{{ $surat->surat->perihal }}</td>
+                            <td>{{ $surat->tanggal_disposisi->format('d/m/Y') }}</td>
                             <td>
-                                <a href="{{ route('kepala.surat.show', $surat) }}" class="text-blue-700 font-semibold">
-                                    Lihat surat
+                                <a href="{{ route('disposisi.show', $surat) }}" class="text-blue-700 font-semibold">
+                                    Tinjau
                                 </a>
                             </td>
                         </tr>
@@ -68,8 +68,8 @@
                         <tr>
                             <td colspan="4" class="role-summary-empty">
                                 <span class="role-summary-empty-icon"><x-dashboard-icon name="inbox" /></span>
-                                <strong>Tidak ada antrean surat</strong>
-                                <span>Semua surat dari TU telah diproses.</span>
+                                <strong>Tidak ada pengajuan menunggu</strong>
+                                <span>Disposisi dari TU akan tampil di sini untuk ditinjau.</span>
                             </td>
                         </tr>
                         @endforelse
@@ -119,4 +119,51 @@
             </a>
         </aside>
     </div>
+
+    <section class="role-summary-panel mt-6" aria-labelledby="outgoing-approval-title">
+        <header class="role-summary-panel-header">
+            <div>
+                <h3 id="outgoing-approval-title">Surat Keluar Menunggu Persetujuan</h3>
+                <span>Surat yang sudah diperiksa Kepala TU dan diteruskan oleh TU.</span>
+            </div>
+            <a href="{{ route('surat-keluar.index') }}" class="role-summary-view-all">
+                Lihat semua <x-dashboard-icon name="arrow" />
+            </a>
+        </header>
+
+        <div class="role-summary-table-wrap" tabindex="0" role="region"
+             aria-label="Surat keluar menunggu persetujuan Kepala Sekolah">
+            <table class="role-summary-table">
+                <thead>
+                    <tr>
+                        <th>Perihal</th>
+                        <th>Tujuan</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($ringkasan['surat_keluar_menunggu'] as $surat)
+                        <tr>
+                            <td>{{ $surat->perihal }}</td>
+                            <td>{{ $surat->tujuan }}</td>
+                            <td>{{ $surat->tanggal_surat->format('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ route('surat-keluar.show', $surat) }}" class="font-semibold text-blue-700">
+                                    Tinjau surat
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="role-summary-empty">
+                                <strong>Tidak ada surat keluar menunggu persetujuan.</strong>
+                                <span>Surat dari TU yang menunggu keputusan akan tampil di sini.</span>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 </section>

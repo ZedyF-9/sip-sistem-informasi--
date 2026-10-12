@@ -21,7 +21,7 @@ class MitraController extends Controller
         $q = trim($data['q'] ?? '');
 
         $items = MitraIndustri::query()
-            ->withCount('kerjasamas')
+            ->withCount('agendas')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($search) use ($q) {
                     $search->where('nama_mitra', 'like', "%{$q}%")
@@ -69,11 +69,14 @@ class MitraController extends Controller
 
     public function show(MitraIndustri $mitra)
     {
-        $kerjasamas = $mitra->kerjasamas()
-            ->latest('tanggal_mulai')
+        $agendas = $mitra->agendas()
+            ->with('pembuat')
+            ->orderBy('tanggal')
+            ->orderBy('waktu')
+            ->orderBy('id')
             ->paginate(10);
 
-        return view('mitra.show', compact('mitra', 'kerjasamas'));
+        return view('mitra.show', compact('mitra', 'agendas'));
     }
 
     public function edit(MitraIndustri $mitra)
@@ -90,6 +93,7 @@ class MitraController extends Controller
         $data['disetujui_oleh'] = null;
         $data['disetujui_pada'] = null;
 
+        $logoLama = $mitra->logo;
         $path = $this->storeLogo($request);
 
         if ($path) {
@@ -104,6 +108,10 @@ class MitraController extends Controller
             }
 
             throw $exception;
+        }
+
+        if ($path && $logoLama && $logoLama !== $path) {
+            Storage::disk('local')->delete($logoLama);
         }
 
         return redirect()->route('tu.mitra.show', $mitra)

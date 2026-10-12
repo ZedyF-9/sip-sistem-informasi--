@@ -14,10 +14,15 @@ class Disposisi extends Model
         'pemberi_id',
         'penerima_id',
         'instruksi',
+        'arahan',
         'prioritas',
         'tanggal_disposisi',
         'batas_waktu',
         'status',
+        'status_persetujuan',
+        'disetujui_oleh',
+        'disetujui_at',
+        'catatan_persetujuan',
     ];
 
     protected function casts(): array
@@ -25,6 +30,8 @@ class Disposisi extends Model
         return [
             'tanggal_disposisi' => 'date',
             'batas_waktu' => 'date',
+            'arahan' => 'array',
+            'disetujui_at' => 'datetime',
         ];
     }
 
@@ -41,5 +48,10 @@ class Disposisi extends Model
     public function penerima(): BelongsTo
     {
         return $this->belongsTo(User::class, 'penerima_id');
+    }
+
+    public function penyetuju(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'disetujui_oleh');
     }
 }

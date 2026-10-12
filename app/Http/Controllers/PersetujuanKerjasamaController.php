@@ -11,17 +11,12 @@ class PersetujuanKerjasamaController extends Controller
 {
     public function index()
     {
-        $items = Kerjasama::query()
-            ->with('mitra')
-            ->orderByRaw("CASE status_persetujuan WHEN 'menunggu' THEN 0 ELSE 1 END")
-            ->latest('updated_at')
-            ->paginate(15);
         $mitras = MitraIndustri::query()
             ->where('status_persetujuan', 'menunggu')
             ->orderBy('nama_mitra')
             ->paginate(15, ['*'], 'halaman_mitra');
 
-        return view('waka-humas.kerjasama', compact('items', 'mitras'));
+        return view('waka-humas.kerjasama', compact('mitras'));
     }
 
     public function approveMitra(MitraIndustri $mitra)

@@ -1,18 +1,18 @@
 @extends('layouts.internal')
 
-@section('title', 'Kegiatan dan Sertifikat')
+@section('title', 'PKL dan Sertifikat')
 
 @section('content')
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm text-slate-600">
-            Catat kegiatan dan terbitkan sertifikat peserta.
+            Kelola sesi PKL secara terpisah. Impor peserta dari Excel, lalu terbitkan sertifikat per kelas atau jurusan.
         </p>
 
         <a
             href="{{ route('tu.kegiatan.create') }}"
             class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white"
         >
-            Tambah Kegiatan
+            + Buat Sesi PKL
         </a>
     </div>
 
@@ -21,8 +21,8 @@
             name="q"
             value="{{ $q }}"
             maxlength="100"
-            placeholder="Cari kegiatan..."
-            aria-label="Cari kegiatan"
+            placeholder="Cari sesi PKL..."
+            aria-label="Cari sesi PKL"
             class="w-full rounded-xl border border-slate-300 px-4 py-3"
         >
 
@@ -35,10 +35,11 @@
         <table class="w-full text-left text-sm">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="p-4">Kegiatan</th>
-                    <th class="p-4">Tanggal</th>
+                    <th class="p-4">Sesi PKL</th>
+                    <th class="p-4">Tanggal PKL</th>
+                    <th class="p-4">Siswa</th>
                     <th class="p-4">Sertifikat</th>
-                    <th class="p-4">Tindakan</th>
+                    <th class="p-4">Aksi</th>
                 </tr>
             </thead>
 
@@ -56,6 +57,7 @@
                             {{ $kegiatan->tanggal_selesai->format('d-m-Y') }}
                         </td>
 
+                        <td class="p-4">{{ $kegiatan->peserta_pkls_count }}</td>
                         <td class="p-4">{{ $kegiatan->sertifikats_count }}</td>
 
                         <td class="p-4">
@@ -65,18 +67,18 @@
                             >
                                 Kelola
                             </a>
-                            @if ($kegiatan->sertifikats_count === 0)
+                            @if ($kegiatan->sertifikats_count === 0 && $kegiatan->peserta_pkls_count === 0)
                                 <x-hapus-data :action="route('tu.kegiatan.destroy', $kegiatan)" :label="$kegiatan->nama"
-                                    :message="'Hapus agenda/kegiatan '.$kegiatan->nama.' secara permanen?'" />
+                                    :message="'Hapus periode PKL '.$kegiatan->nama.' secara permanen?'" />
                             @else
-                                <p class="mt-2 text-xs text-slate-500">Memiliki sertifikat; tidak dapat dihapus.</p>
+                                <p class="mt-2 text-xs text-slate-500">Memiliki siswa atau sertifikat; tidak dapat dihapus.</p>
                             @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="p-8 text-center text-slate-500">
-                            Belum ada kegiatan.
+                        <td colspan="5" class="p-8 text-center text-slate-500">
+                            Belum ada sesi PKL. Buat Sesi 1 dan Sesi 2 secara terpisah jika PKL dibagi dua gelombang.
                         </td>
                     </tr>
                 @endforelse

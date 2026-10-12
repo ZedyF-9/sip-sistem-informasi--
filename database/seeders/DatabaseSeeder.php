@@ -19,6 +19,11 @@ class DatabaseSeeder extends Seeder
         'role' => 'koordinator_tu',
     ],
     [
+        'name' => 'Kepala TU',
+        'email' => 'kepala_tu@smkn4.com',
+        'role' => 'kepala_tu',
+    ],
+    [
         'name' => 'Kepala Sekolah',
         'email' => 'kepala_sekolah@smkn4.com',
         'role' => 'kepala_sekolah',
@@ -69,8 +74,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // Jika salah satu akun gagal disimpan,
-        // semua perubahan dalam transaksi dibatalkan.
+      
         DB::transaction(function () use ($daftarAkun, $passwordBaru) {
             foreach ($daftarAkun as $data) {
                 $akun = User::firstOrNew([

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Throwable;
 
 class SuratKeluarController extends Controller
@@ -17,21 +18,18 @@ class SuratKeluarController extends Controller
     public function index(Request $request)
     {
         $data = $request->validate([
-            'status' => [
-                'nullable',
-                Rule::in(['draf', 'diajukan', 'revisi', 'disetujui', 'dikirim']),
-            ],
+            'status' => ['nullable', Rule::in(['dikirim', 'menunggu_kepala_tu', 'kembali_ke_tu', 'diajukan', 'disetujui', 'draf', 'revisi'])],
             'q' => ['nullable', 'string', 'max:100'],
         ]);
 
         $status = $data['status'] ?? '';
         $q = trim($data['q'] ?? '');
 
+        $role = $request->user()->role;
         $items = SuratKeluar::query()
-            ->when(
-                $request->user()->role === 'kepala_sekolah',
-                fn ($query) => $query->where('status', '!=', 'draf')
-            )
+            ->when($role === 'kepala_tu', fn ($query) => $query->where('status', 'menunggu_kepala_tu'))
+            ->when($role === 'kepala_sekolah', fn ($query) => $query->whereIn('status', ['diajukan', 'disetujui', 'dikirim']))
+            ->when($role === 'koordinator_tu', fn ($query) => $query->whereIn('status', ['draf', 'revisi', 'kembali_ke_tu', 'diajukan', 'disetujui', 'dikirim']))
             ->when(
                 $status !== '',
                 fn ($query) => $query->where('status', $status)
@@ -59,39 +57,79 @@ class SuratKeluarController extends Controller
 
     public function store(StoreSuratKeluarRequest $request)
     {
-        $data = $request->validated();
-        unset($data['version']);
+        $input = $request->validated();
+        $jenis = $input['jenis_surat'];
+        $dataSurat = collect($input)->except(['jenis_surat', 'tanggal_surat'])->all();
+        [$tujuan, $perihal, $keterangan] = match ($jenis) {
+            'Surat Undangan' => [
+                $dataSurat['alamat_penerima'],
+                'Undangan '.$dataSurat['nama_kegiatan'],
+                $dataSurat['keperluan'],
+            ],
+            'Surat Perintah Tugas' => [
+                $dataSurat['nama_penerima_tugas'].' — '.$dataSurat['jabatan_penerima'],
+                'Surat Perintah Tugas',
+                $dataSurat['uraian_tugas'],
+            ],
+            'Surat Keputusan' => [
+                $dataSurat['nama_penerima_sk'].' — '.$dataSurat['jabatan_penerima_sk'],
+                'Surat Keputusan '.$dataSurat['nama_tugas'],
+                'Tahun Pelajaran '.$dataSurat['tahun_pelajaran'],
+            ],
+            default => [
+                $dataSurat['sekolah_tujuan'],
+                'Rekomendasi Mutasi/Pindah Siswa',
+                'Rekomendasi mutasi '.$dataSurat['nama_siswa'].' ke '.$dataSurat['sekolah_tujuan'],
+            ],
+        };
 
-        $path = $request->file('file_surat')
-            ->store('surat-keluar', 'local');
-
-        if (! $path) {
-            throw ValidationException::withMessages([
-                'file_surat' => 'PDF gagal disimpan.',
-            ]);
-        }
-
-        $data['file_surat'] = $path;
-
+        $data = [
+            'tanggal_surat' => $input['tanggal_surat'],
+            'jenis_surat' => $jenis,
+            'tujuan' => $tujuan,
+            'perihal' => $perihal,
+            'keterangan' => $keterangan,
+            'data_surat' => $dataSurat,
+            'sifat_surat' => 'biasa',
+        ];
+        $path = null;
         try {
-            $surat = DB::transaction(function () use ($data, $request) {
+            $surat = DB::transaction(function () use ($data, $request, &$path) {
+                $data['nomor_surat'] = null;
+                $data['status'] = 'draf';
+
+                $pdf = Pdf::loadView('surat-keluar.pdf', [
+                    'surat' => (object) $data,
+                    'logoKepri' => base64_encode(file_get_contents(public_path('reference/kepri.jpg'))),
+                    'logoSekolah' => base64_encode(file_get_contents(public_path('reference/image.jpg'))),
+                ])->output();
+                $path = 'surat-keluar/'.uniqid('surat-', true).'.pdf';
+                if (! Storage::disk('local')->put($path, $pdf)) {
+                    throw ValidationException::withMessages([
+                        'file_surat' => 'PDF gagal disimpan.',
+                    ]);
+                }
+                $data['file_surat'] = $path;
+
                 $surat = new SuratKeluar($data);
                 $surat->created_by = $request->user()->id;
                 $surat->status = 'draf';
                 $surat->version = 1;
                 $surat->save();
 
-                $this->history($surat, $request->user()->id, 'buat', null);
+                $this->history($surat, $request->user()->id, 'buat_draf', null, 'Draf surat dibuat untuk diajukan ke Kepala TU.');
 
                 return $surat;
             });
         } catch (Throwable $exception) {
-            Storage::disk('local')->delete($path);
+            if ($path) {
+                Storage::disk('local')->delete($path);
+            }
             throw $exception;
         }
 
         return redirect()->route('surat-keluar.show', $surat)
-            ->with('status', 'Draf surat keluar dibuat.');
+            ->with('status', 'Draf surat dibuat. Ajukan untuk pemeriksaan Kepala TU.');
     }
 
     public function show(Request $request, SuratKeluar $suratKeluar)
@@ -128,28 +166,37 @@ class SuratKeluarController extends Controller
         StoreSuratKeluarRequest $request,
         SuratKeluar $suratKeluar
     ) {
-        $data = $request->validated();
-        $version = (int) $data['version'];
-        unset($data['version'], $data['file_surat']);
-
-        $path = null;
-
-        if ($request->hasFile('file_surat')) {
-            $path = $request->file('file_surat')
-                ->store('surat-keluar', 'local');
-
-            if (! $path) {
-                throw ValidationException::withMessages([
-                    'file_surat' => 'PDF gagal disimpan.',
-                ]);
-            }
-
-            $data['file_surat'] = $path;
+        $input = $request->validated();
+        $version = (int) ($input['version'] ?? 0);
+        unset($input['version']);
+        $jenis = $input['jenis_surat'];
+        $dataSurat = collect($input)->except(['jenis_surat', 'tanggal_surat'])->all();
+        [$tujuan, $perihal, $keterangan] = match ($jenis) {
+            'Surat Undangan' => [$dataSurat['alamat_penerima'], 'Undangan '.$dataSurat['nama_kegiatan'], $dataSurat['keperluan']],
+            'Surat Perintah Tugas' => [$dataSurat['nama_penerima_tugas'].' — '.$dataSurat['jabatan_penerima'], 'Surat Perintah Tugas', $dataSurat['uraian_tugas']],
+            'Surat Keputusan' => [$dataSurat['nama_penerima_sk'].' — '.$dataSurat['jabatan_penerima_sk'], 'Surat Keputusan '.$dataSurat['nama_tugas'], 'Tahun Pelajaran '.$dataSurat['tahun_pelajaran']],
+            default => [$dataSurat['sekolah_tujuan'], 'Rekomendasi Mutasi/Pindah Siswa', 'Rekomendasi mutasi '.$dataSurat['nama_siswa'].' ke '.$dataSurat['sekolah_tujuan']],
+        };
+        $data = [
+            'tanggal_surat' => $input['tanggal_surat'], 'jenis_surat' => $jenis,
+            'tujuan' => $tujuan, 'perihal' => $perihal, 'keterangan' => $keterangan,
+            'data_surat' => $dataSurat, 'sifat_surat' => 'biasa',
+            'nomor_surat' => null, 'status' => 'revisi',
+        ];
+        $path = 'surat-keluar/'.uniqid('surat-', true).'.pdf';
+        $pdf = Pdf::loadView('surat-keluar.pdf', [
+            'surat' => (object) $data,
+            'logoKepri' => base64_encode(file_get_contents(public_path('reference/kepri.jpg'))),
+            'logoSekolah' => base64_encode(file_get_contents(public_path('reference/image.jpg'))),
+        ])->output();
+        if (! Storage::disk('local')->put($path, $pdf)) {
+            throw ValidationException::withMessages(['file_surat' => 'PDF gagal disimpan.']);
         }
+        $oldPath = null;
 
         try {
             DB::transaction(function () use (
-                $request, $suratKeluar, $data, $version
+                $request, $suratKeluar, $data, $version, $path, &$oldPath
             ) {
                 $surat = SuratKeluar::query()
                     ->lockForUpdate()->findOrFail($suratKeluar->id);
@@ -161,28 +208,31 @@ class SuratKeluarController extends Controller
                 }
 
                 $sebelum = $surat->status;
+                $oldPath = $surat->file_surat;
                 $surat->fill($data);
+                $surat->file_surat = $path;
                 $surat->version++;
                 $surat->save();
 
                 $this->history(
                     $surat,
                     $request->user()->id,
-                    'edit',
+                    'revisi_tu',
                     $sebelum,
-                    'Data atau berkas draf diperbarui.'
+                    'TU memperbaiki surat sesuai catatan pemeriksaan Kepala TU.'
                 );
             });
         } catch (Throwable $exception) {
-            if ($path) {
-                Storage::disk('local')->delete($path);
-            }
-
+            Storage::disk('local')->delete($path);
             throw $exception;
         }
 
+        if ($oldPath && $oldPath !== $path) {
+            Storage::disk('local')->delete($oldPath);
+        }
+
         return redirect()->route('surat-keluar.show', $suratKeluar)
-            ->with('status', 'Draf diperbarui. Ajukan kembali jika sudah siap.');
+            ->with('status', 'Revisi disimpan. Periksa surat, lalu ajukan kembali ke Kepala TU.');
     }
 
     public function action(Request $request, SuratKeluar $suratKeluar)
@@ -191,7 +241,7 @@ class SuratKeluarController extends Controller
             'version' => ['required', 'integer', 'min:1'],
             'aksi' => [
                 'required',
-                Rule::in(['ajukan', 'setujui', 'revisi', 'nomor', 'kirim']),
+                Rule::in(['ajukan', 'teruskan_kepala', 'setujui', 'revisi', 'nomor', 'kirim']),
             ],
             'catatan' => [
                 'nullable',
@@ -216,11 +266,11 @@ class SuratKeluarController extends Controller
                 'Catatan pengiriman wajib diisi.',
         ]);
 
-        $tuActions = ['ajukan', 'nomor', 'kirim'];
-
-        $requiredRole = in_array($data['aksi'], $tuActions, true)
-            ? 'koordinator_tu'
-            : 'kepala_sekolah';
+        $requiredRole = match ($data['aksi']) {
+            'ajukan', 'nomor', 'kirim' => 'koordinator_tu',
+            'teruskan_kepala', 'revisi' => 'kepala_tu',
+            default => 'kepala_sekolah',
+        };
 
         abort_unless($request->user()->role === $requiredRole, 403);
 
@@ -235,7 +285,7 @@ class SuratKeluarController extends Controller
             $catatan = $data['catatan'] ?? null;
 
             if (
-                in_array($aksi, ['ajukan', 'setujui', 'kirim'], true)
+                in_array($aksi, ['ajukan', 'teruskan_kepala', 'setujui', 'kirim'], true)
                 && ! Storage::disk('local')->exists($surat->file_surat)
             ) {
                 $this->fail('PDF tidak tersedia. Periksa berkas surat.');
@@ -243,11 +293,22 @@ class SuratKeluarController extends Controller
 
             switch ($aksi) {
                 case 'ajukan':
-                    if (! in_array($surat->status, ['draf', 'revisi'], true)) {
-                        $this->fail('Hanya draf atau revisi yang dapat diajukan.');
+                    if ($surat->status === 'kembali_ke_tu') {
+                        $surat->status = 'diajukan';
+                    } elseif ($surat->status === 'revisi') {
+                        $surat->status = 'menunggu_kepala_tu';
+                    } elseif ($surat->status === 'draf') {
+                        $surat->status = 'menunggu_kepala_tu';
+                    } else {
+                        $this->fail('Surat belum siap diajukan.');
                     }
+                    break;
 
-                    $surat->status = 'diajukan';
+                case 'teruskan_kepala':
+                    if ($surat->status !== 'menunggu_kepala_tu') {
+                        $this->fail('Surat tidak sedang menunggu pemeriksaan Kepala TU.');
+                    }
+                    $surat->status = 'kembali_ke_tu';
                     break;
 
                 case 'setujui':
@@ -262,8 +323,8 @@ class SuratKeluarController extends Controller
                     break;
 
                 case 'revisi':
-                    if ($surat->status !== 'diajukan') {
-                        $this->fail('Hanya surat diajukan yang dapat direvisi.');
+                    if ($surat->status !== 'menunggu_kepala_tu') {
+                        $this->fail('Hanya surat yang diperiksa Kepala TU yang dapat diminta revisi.');
                     }
 
                     $surat->status = 'revisi';
@@ -276,28 +337,7 @@ class SuratKeluarController extends Controller
                     }
 
                     $tahun = (int) $surat->tanggal_surat->format('Y');
-
-                    DB::table('nomor_surat_tahunans')->insertOrIgnore([
-                        'tahun' => $tahun,
-                        'nomor_terakhir' => 0,
-                    ]);
-
-                    $sequence = DB::table('nomor_surat_tahunans')
-                        ->where('tahun', $tahun)
-                        ->lockForUpdate()
-                        ->first();
-
-                    $nomor = $sequence->nomor_terakhir + 1;
-
-                    DB::table('nomor_surat_tahunans')
-                        ->where('tahun', $tahun)
-                        ->update(['nomor_terakhir' => $nomor]);
-
-                    $surat->nomor_surat = sprintf(
-                        'S-%04d/SMKN4/%d',
-                        $nomor,
-                        $tahun
-                    );
+                    $surat->nomor_surat = $this->nextOutgoingNumber($tahun);
 
                     $catatan = 'Nomor ditetapkan: '.$surat->nomor_surat;
                     break;
@@ -330,8 +370,16 @@ class SuratKeluarController extends Controller
             );
         });
 
+        $pesan = match (true) {
+            $data['aksi'] === 'ajukan' && $suratKeluar->status === 'revisi'
+                => 'Surat revisi berhasil dikirim kembali ke antrean pemeriksaan Kepala TU.',
+            $data['aksi'] === 'ajukan' && $suratKeluar->status === 'kembali_ke_tu'
+                => 'Surat berhasil diteruskan ke Kepala Sekolah.',
+            default => 'Tindakan berhasil disimpan.',
+        };
+
         return redirect()->route('surat-keluar.show', $suratKeluar)
-            ->with('status', 'Tindakan berhasil disimpan.');
+            ->with('status', $pesan);
     }
 
     public function download(Request $request, SuratKeluar $suratKeluar)
@@ -369,7 +417,7 @@ class SuratKeluarController extends Controller
         abort_unless(
             in_array(
                 $request->user()->role,
-                ['koordinator_tu', 'kepala_sekolah'],
+                ['koordinator_tu', 'kepala_tu', 'kepala_sekolah'],
                 true
             ),
             403
@@ -380,6 +428,26 @@ class SuratKeluarController extends Controller
             && $surat->status === 'draf',
             403
         );
+    }
+
+    private function nextOutgoingNumber(int $tahun): string
+    {
+        DB::table('nomor_surat_tahunans')->insertOrIgnore([
+            'tahun' => $tahun,
+            'nomor_terakhir' => 0,
+        ]);
+
+        $sequence = DB::table('nomor_surat_tahunans')
+            ->where('tahun', $tahun)
+            ->lockForUpdate()
+            ->first();
+        $nomor = $sequence->nomor_terakhir + 1;
+
+        DB::table('nomor_surat_tahunans')
+            ->where('tahun', $tahun)
+            ->update(['nomor_terakhir' => $nomor]);
+
+        return sprintf('S-%04d/SMKN4/%d', $nomor, $tahun);
     }
 
     private function checkVersion(SuratKeluar $surat, int $version): void
@@ -425,7 +493,7 @@ class SuratKeluarController extends Controller
             'file_surat' => $surat->file_surat,
             'snapshot' => json_encode($surat->only([
                 'nomor_surat', 'perihal', 'tujuan', 'jenis_surat',
-                'sifat_surat', 'tanggal_surat', 'version',
+                'sifat_surat', 'tanggal_surat', 'version', 'keterangan', 'data_surat',
             ]), JSON_THROW_ON_ERROR),
             'created_at' => now(),
             'updated_at' => now(),

@@ -7,7 +7,7 @@
         <h1 class="text-3xl font-bold text-blue-950">Verifikasi Sertifikat</h1>
 
         <p class="mt-3 text-slate-600">
-            Masukkan kode yang tercetak pada sertifikat atau pindai QR Code.
+            Masukkan kode angka 8 digit yang tercetak pada sertifikat atau pindai QR Code.
         </p>
 
         @if ($errors->any())
@@ -31,9 +31,11 @@
                 id="kode"
                 name="kode"
                 value="{{ old('kode', $kode) }}"
-                minlength="64"
+                minlength="8"
                 maxlength="64"
-                pattern="[a-f0-9]{64}"
+                pattern="([0-9]{8}|[a-f0-9]{64})"
+                inputmode="numeric"
+                placeholder="Contoh: 12345678"
                 required
                 autocomplete="off"
                 spellcheck="false"
@@ -58,15 +60,25 @@
                             'Nama' => $hasil['nama'],
                             'Kegiatan' => $hasil['kegiatan'],
                             'Peran' => $hasil['peran'],
+                            'Kelas' => $hasil['kelas'] ?? null,
+                            'Jurusan' => $hasil['jurusan'] ?? null,
                             'Tanggal Terbit' => $hasil['tanggal'],
                         ] as $label => $value)
+                            @if ($value)
                             <div>
                                 <dt class="text-emerald-700">{{ $label }}</dt>
                                 <dd class="mt-1 font-semibold text-emerald-950">
-                                    {{ $value }}
+                                    {{ $value ?: '—' }}
                                 </dd>
                             </div>
+                            @endif
                         @endforeach
+                        @if (!empty($hasil['industri']))
+                            <div>
+                                <dt class="text-emerald-700">Industri PKL</dt>
+                                <dd class="mt-1 font-semibold text-emerald-950">{{ $hasil['industri'] }}</dd>
+                            </div>
+                            @endif
                     </dl>
 
                     <p class="mt-5 text-sm text-emerald-800">

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware([
     'auth',
-    EnsureInternalAccess::class.':koordinator_tu,kepala_sekolah',
+    EnsureInternalAccess::class.':koordinator_tu,kepala_tu,kepala_sekolah',
 ])->group(function () {
     Route::prefix('surat-keluar')->name('surat-keluar.')
         ->group(function () {
@@ -22,14 +22,20 @@ Route::middleware([
                 ->middleware(EnsureInternalAccess::class.':koordinator_tu')
                 ->name('store');
 
-            Route::get('/{suratKeluar}/edit', [
-                SuratKeluarController::class, 'edit',
-            ])->middleware(EnsureInternalAccess::class.':koordinator_tu')
+            Route::get('/{suratKeluar}/edit', [SuratKeluarController::class, 'edit'])
+                ->middleware(EnsureInternalAccess::class.':koordinator_tu')
                 ->name('edit');
 
-            Route::put('/{suratKeluar}', [
-                SuratKeluarController::class, 'update',
-            ])->middleware(EnsureInternalAccess::class.':koordinator_tu')
+            Route::put('/{suratKeluar}', [SuratKeluarController::class, 'update'])
+                ->middleware(EnsureInternalAccess::class.':koordinator_tu')
+                ->name('update');
+
+            Route::get('/{suratKeluar}/edit', [SuratKeluarController::class, 'edit'])
+                ->middleware(EnsureInternalAccess::class.':koordinator_tu')
+                ->name('edit');
+
+            Route::put('/{suratKeluar}', [SuratKeluarController::class, 'update'])
+                ->middleware(EnsureInternalAccess::class.':koordinator_tu')
                 ->name('update');
 
             Route::post('/{suratKeluar}/aksi', [

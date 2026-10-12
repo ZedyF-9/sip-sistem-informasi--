@@ -25,6 +25,7 @@ class ResetPasswordAkun extends Command
         $users = User::query()
             ->whereIn('role', [
                 'koordinator_tu',
+                'kepala_tu',
                 'kepala_sekolah',
                 'waka_humas',
                 'penerima_disposisi',

@@ -68,6 +68,7 @@ class PenerbitSertifikat
                 $sertifikat->nama_penerima = $data['nama_penerima'];
                 $sertifikat->peran = $data['peran'];
                 $sertifikat->kode_verifikasi = bin2hex(random_bytes(32));
+                $sertifikat->kode_cetak = $this->kodeCetakUnik();
                 $sertifikat->tanggal_terbit = $hariIni;
                 $sertifikat->status = 'aktif';
                 $sertifikat->created_by = $userId;
@@ -82,6 +83,9 @@ class PenerbitSertifikat
                         ->format('d-m-Y'),
                     'nama_penerima' => $data['nama_penerima'],
                     'peran' => $data['peran'],
+                    'industri' => $data['industri'] ?? null,
+                    'kelas' => $data['kelas'] ?? null,
+                    'jurusan' => $data['jurusan'] ?? null,
                 ];
 
                 $sertifikat->save();
@@ -111,12 +115,40 @@ class PenerbitSertifikat
                 $qr = 'data:image/svg+xml;base64,'
                     .base64_encode($svg);
 
+                $template = 'data:image/png;base64,'
+                    .base64_encode(file_get_contents(
+                        public_path(
+                            'reference/serifikat/'
+                            .'Gambar ChatGPT 28 Sep 2026, 14.00.25-1.png'
+                        )
+                    ));
+                $asset = fn (string $file) => 'data:image/png;base64,'
+                    .base64_encode(file_get_contents(public_path(
+                        'reference/serifikat/'.$file
+                    )));
+
                 $pdf = Pdf::loadView('sertifikat.pdf', [
                     'sertifikat' => $sertifikat,
                     'snapshot' => $sertifikat->snapshot,
                     'qr' => $qr,
+                    'template' => $template,
+                    'logoKepri' => $asset(
+                        'Gambar ChatGPT 28 Sep 2026, 14.00.27-3.png'
+                    ),
+                    'logoSekolah' => $asset(
+                        'Gambar ChatGPT 28 Sep 2026, 14.00.28-4.png'
+                    ),
+                    'tutWuri' => $asset(
+                        'Gambar ChatGPT 28 Sep 2026, 14.00.29-5.png'
+                    ),
+                    'stempel' => $asset(
+                        'Gambar ChatGPT 28 Sep 2026, 14.00.30-6.png'
+                    ),
+                    'motto' => $asset(
+                        'Gambar ChatGPT 28 Sep 2026, 14.00.26-2.png'
+                    ),
                 ])
-                    ->setPaper('a4', 'landscape')
+                    ->setPaper([0, 0, 841.89, 563.15])
                     ->setOption('isRemoteEnabled', false)
                     ->setOption('isPhpEnabled', false)
                     ->setOption('isJavascriptEnabled', false);
@@ -142,5 +174,14 @@ class PenerbitSertifikat
 
             throw $exception;
         }
+    }
+
+    private function kodeCetakUnik(): string
+    {
+        do {
+            $kode = (string) random_int(10000000, 99999999);
+        } while (Sertifikat::query()->where('kode_cetak', $kode)->exists());
+
+        return $kode;
     }
 }

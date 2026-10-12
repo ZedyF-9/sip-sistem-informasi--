@@ -14,7 +14,7 @@
             <select id="status" name="status"
                     class="rounded-xl border border-slate-300 bg-white px-4 py-3">
                 <option value="">Semua status</option>
-                @foreach (['baru', 'diproses', 'selesai'] as $value)
+                @foreach (['baru', 'diproses'] as $value)
                     <option value="{{ $value }}" @selected($status === $value)>
                         {{ ucfirst($value) }}
                     </option>
@@ -26,13 +26,36 @@
             </button>
         </form>
 
-        @if (auth()->user()->role === 'kepala_sekolah')
+        @if (auth()->user()->role === 'koordinator_tu')
             <a href="{{ route('disposisi.create') }}"
                class="dashboard-button-create rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">
                 + Buat Disposisi
             </a>
         @endif
     </div>
+
+    @if (auth()->user()->role === 'koordinator_tu' && $status === '' && $suratMenunggu->isNotEmpty())
+        <h2 class="mb-3 text-lg font-bold text-slate-900">Surat Masuk Belum Didisposisikan</h2>
+        <div class="mb-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50"><tr>
+                    <th class="p-4">Nomor surat</th><th class="p-4">Tanggal diterima</th>
+                    <th class="p-4">Asal</th><th class="p-4">Perihal</th><th class="p-4">Aksi</th>
+                </tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach ($suratMenunggu as $surat)
+                        <tr>
+                            <td class="p-4">{{ $surat->nomor_surat ?: $surat->nomor_agenda }}</td>
+                            <td class="p-4">{{ $surat->tanggal_diterima->format('d/m/Y') }}</td>
+                            <td class="p-4">{{ $surat->asal_surat }}</td>
+                            <td class="p-4">{{ $surat->perihal }}</td>
+                            <td class="p-4"><a class="font-semibold text-blue-700" href="{{ route('disposisi.create', ['surat_masuk_id' => $surat->id]) }}">Buat disposisi</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     <div tabindex="0" role="region" aria-label="Tabel data, geser untuk melihat seluruh kolom" class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
         <table class="w-full text-left text-sm">
@@ -68,7 +91,7 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status }}">{{ ucfirst($item->status) }}</span></td>
+                        <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan === 'menunggu' ? 'baru' : $item->status }}">{{ $item->penerima->role === 'kepala_sekolah' ? ($item->status_persetujuan === 'menunggu' ? 'Menunggu tinjauan Kepsek' : 'Disetujui, menunggu disposisi Kepsek') : ucfirst($item->status) }}</span></td>
                         <td class="p-4">
                             <a href="{{ route('disposisi.show', $item) }}"
                                class="font-semibold text-blue-700">

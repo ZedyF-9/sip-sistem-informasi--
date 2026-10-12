@@ -8,12 +8,10 @@
            class="rounded-xl border bg-white px-5 py-3">Kembali</a>
         <a href="{{ route('tu.mitra.edit', $mitra) }}"
            class="rounded-xl bg-blue-700 px-5 py-3 text-white">Edit Mitra</a>
-        <a href="{{ route('tu.kerjasama.create', $mitra) }}"
-           class="rounded-xl bg-blue-700 px-5 py-3 text-white">+ Tambah Kerja Sama</a>
         <x-hapus-data :action="route('tu.mitra.destroy', $mitra)" :label="$mitra->nama_mitra"
-            :message="'Hapus mitra '.$mitra->nama_mitra.'? Semua kerja sama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
+            :message="'Hapus mitra '.$mitra->nama_mitra.'? Semua agenda, kerja sama lama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
 
-        @if ($mitra->status === 'aktif')
+        @if ($mitra->status === 'aktif' && $mitra->status_persetujuan === 'disetujui')
             <a href="{{ route('publik.mitra.show', $mitra) }}"
                class="rounded-xl border border-blue-700 px-5 py-3 text-blue-700">
                 Lihat Portal Publik
@@ -54,59 +52,69 @@
         @endif
     </section>
 
-    <section class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-        <h2 class="p-6 text-lg font-bold">Daftar Kerja Sama</h2>
+    <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+        <div>
+            <h2 class="text-xl font-bold">Agenda Mitra</h2>
+            <p class="mt-1 text-sm text-slate-600">Catat kunjungan, rapat, dan kegiatan lain bersama mitra ini.</p>
+        </div>
 
-        <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th class="p-4">Judul / Nomor MoU</th>
-                    <th class="p-4">Periode</th>
-                    <th class="p-4">Kondisi</th>
-                    <th class="p-4">Persetujuan</th>
-                    <th class="p-4">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse ($kerjasamas as $item)
-                    <tr>
-                        <td class="p-4">
-                            <p class="font-semibold">{{ $item->judul }}</p>
-                            <p class="mt-1 text-slate-500">{{ $item->nomor_mou ?: 'Tanpa nomor' }}</p>
-                        </td>
-                        <td class="p-4">
-                            {{ $item->tanggal_mulai->format('d/m/Y') }}
-                            –
-                            {{ $item->tanggal_selesai?->format('d/m/Y') ?? 'Tanpa batas akhir' }}
-                        </td>
-                        <td class="p-4">{{ $item->labelPeriode() }}</td>
-                        <td class="p-4">
-                            <span class="dashboard-badge" data-status="{{ $item->status_persetujuan }}">{{ ucfirst($item->status_persetujuan) }}</span>
-                            @if ($item->catatan_persetujuan)
-                                <p class="mt-2 max-w-xs text-xs text-red-700">{{ $item->catatan_persetujuan }}</p>
+        <form method="POST" action="{{ route('tu.mitra.agenda.store', $mitra) }}"
+              class="mt-5 grid gap-4 rounded-xl bg-slate-50 p-5 md:grid-cols-2">
+            @csrf
+            <div>
+                <label for="judul" class="mb-2 block font-semibold">Nama agenda</label>
+                <input id="judul" name="judul" value="{{ old('judul') }}" maxlength="255"
+                       required class="w-full rounded-lg border border-slate-300 bg-white p-3">
+            </div>
+            <div>
+                <label for="tanggal" class="mb-2 block font-semibold">Tanggal</label>
+                <input id="tanggal" name="tanggal" type="date" value="{{ old('tanggal') }}"
+                       required class="w-full rounded-lg border border-slate-300 bg-white p-3">
+            </div>
+            <div>
+                <label for="waktu" class="mb-2 block font-semibold">Waktu (opsional)</label>
+                <input id="waktu" name="waktu" type="time" value="{{ old('waktu') }}"
+                       class="w-full rounded-lg border border-slate-300 bg-white p-3">
+            </div>
+            <div>
+                <label for="lokasi" class="mb-2 block font-semibold">Lokasi (opsional)</label>
+                <input id="lokasi" name="lokasi" value="{{ old('lokasi') }}" maxlength="255"
+                       class="w-full rounded-lg border border-slate-300 bg-white p-3">
+            </div>
+            <div class="md:col-span-2">
+                <label for="catatan" class="mb-2 block font-semibold">Catatan (opsional)</label>
+                <textarea id="catatan" name="catatan" rows="3" maxlength="2000"
+                          class="w-full rounded-lg border border-slate-300 bg-white p-3">{{ old('catatan') }}</textarea>
+            </div>
+            <div class="md:col-span-2">
+                <button class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Tambahkan Agenda</button>
+            </div>
+        </form>
+
+        <div class="mt-6 space-y-3">
+            @forelse ($agendas as $agenda)
+                <article class="rounded-xl border border-slate-200 p-4">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <h3 class="font-bold">{{ $agenda->judul }}</h3>
+                        <span class="text-sm font-medium text-blue-800">
+                            {{ $agenda->tanggal->format('d/m/Y') }}
+                            @if ($agenda->waktu)
+                                · {{ substr($agenda->waktu, 0, 5) }} WIB
                             @endif
-                        </td>
-                        <td class="p-4">
-                            <a href="{{ route('tu.kerjasama.edit', $item) }}"
-                               class="block font-semibold text-blue-700">Edit</a>
-                            @if ($item->dokumen_mou)
-                                <a href="{{ route('tu.kerjasama.download', $item) }}"
-                                   class="mt-2 block font-semibold text-blue-700">
-                                    Unduh MoU
-                                </a>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="p-10 text-center text-slate-500">
-                            Belum ada kerja sama.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                        </span>
+                    </div>
+                    @if ($agenda->lokasi)
+                        <p class="mt-2 text-sm">Lokasi: {{ $agenda->lokasi }}</p>
+                    @endif
+                    @if ($agenda->catatan)
+                        <p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ $agenda->catatan }}</p>
+                    @endif
+                    <p class="mt-3 text-xs text-slate-500">Ditambahkan oleh {{ $agenda->pembuat?->name ?? 'Pengguna yang sudah dihapus' }}</p>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">Belum ada agenda untuk mitra ini.</p>
+            @endforelse
+        </div>
+        <div class="mt-6">{{ $agendas->links() }}</div>
     </section>
-
-    <div class="mt-6">{{ $kerjasamas->links() }}</div>
 @endsection

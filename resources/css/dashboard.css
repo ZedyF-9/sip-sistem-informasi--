@@ -174,7 +174,7 @@
 .dashboard-content span.bg-emerald-50 { background: #eafaf3; border-color: #d4f1e4; color: #168066; }
 .dashboard-badge[data-status='disetujui'], .dashboard-badge[data-status='selesai'], .dashboard-badge[data-status='dikirim'] { background: #eafaf3; border-color: #d4f1e4; color: #168066; }
 .dashboard-badge[data-status='draf'] { background: #f1f4f9; border-color: #e2e7ef; color: #60718b; }
-.dashboard-badge[data-status='diajukan'], .dashboard-badge[data-status='menunggu_verifikasi'], .dashboard-badge[data-status='diproses'] { background: #fff8e9; border-color: #f6e8c7; color: #976313; }
+.dashboard-badge[data-status='diajukan'], .dashboard-badge[data-status='diproses'] { background: #fff8e9; border-color: #f6e8c7; color: #976313; }
 .dashboard-badge[data-status='ditolak'], .dashboard-badge[data-status='spam'], .dashboard-badge[data-status='revisi'] { background: #fff0f1; border-color: #fadbdc; color: #b34c58; }
 .dashboard-content :where([role='status'], [role='alert']) { border: 1px solid; border-radius: 12px; font-size: 13px; }
 .dashboard-content [role='status'] { background: #ebfaf3; border-color: #cbecdf; color: #246b55; }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SuratMasuk extends Model
 {
@@ -18,6 +19,7 @@ class SuratMasuk extends Model
         'nama_pengirim',
         'email_pengirim',
         'perihal',
+        'keterangan',
         'metode_pengiriman',
         'nomor_agenda',
         'lokasi_arsip_fisik',
@@ -33,7 +35,6 @@ class SuratMasuk extends Model
         return [
             'tanggal_surat' => 'date',
             'tanggal_diterima' => 'date',
-            'diteruskan_at' => 'datetime',
         ];
     }
 
@@ -42,14 +43,24 @@ class SuratMasuk extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function disposisis(): HasMany
+    {
+        return $this->hasMany(Disposisi::class, 'surat_masuk_id');
+    }
+
     public function statusLabel(): string
     {
+        if ($this->status === 'diverifikasi' && $this->relationLoaded('disposisis')
+            && $this->disposisis->contains(fn ($item) =>
+                in_array($item->status_persetujuan, ['menunggu', 'disetujui'], true)
+                && $item->penerima?->role === 'kepala_sekolah'
+            )) {
+            return 'Menunggu Persetujuan Kepala Sekolah';
+        }
+
         return match ($this->status) {
-            'menunggu_verifikasi' => 'Menunggu Verifikasi',
-            'diverifikasi' => 'Diverifikasi',
+            'diverifikasi' => 'Diarsipkan',
             'disposisi' => 'Disposisi',
-            'ditolak' => 'Ditolak',
-            'spam' => 'Spam',
             'selesai' => 'Selesai',
             default => 'Tidak diketahui',
         };

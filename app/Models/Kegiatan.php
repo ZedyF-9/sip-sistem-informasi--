@@ -27,4 +27,9 @@ class Kegiatan extends Model
     {
         return $this->hasMany(Sertifikat::class);
     }
+
+    public function pesertaPkls(): HasMany
+    {
+        return $this->hasMany(PesertaPkl::class);
+    }
 }

@@ -25,6 +25,11 @@ class CreateAllInternalUsers extends Command
 
         $accounts = [
             [
+                'name' => 'Kepala TU',
+                'email' => 'kepala_tu@smkn4.com',
+                'role' => 'kepala_tu',
+            ],
+            [
                 'name' => 'Kepala Sekolah',
                 'email' => 'kepala_sekolah@smkn4.com',
                 'role' => 'kepala_sekolah',

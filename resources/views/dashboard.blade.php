@@ -13,6 +13,12 @@
         @include('partials.dashboard-koordinator-ringkasan')
     @elseif ($account->role === 'kepala_sekolah')
         @include('partials.dashboard-kepala-ringkasan')
+    @elseif ($account->role === 'kepala_tu')
+        <section class="dashboard-data-panel max-w-3xl">
+            <h2 class="text-xl font-bold">Pemeriksaan Surat Keluar</h2>
+            <p class="mt-2 text-sm text-slate-600">{{ $ringkasanKepalaTu['menunggu'] }} surat menunggu pemeriksaan.</p>
+            <a href="{{ route('surat-keluar.index') }}" class="mt-5 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Buka surat untuk diperiksa</a>
+        </section>
     @elseif ($account->role === 'waka_humas')
         <section class="dashboard-data-panel max-w-3xl" aria-label="Persetujuan kerja sama">
             <p class="text-sm text-slate-600">Pengajuan mitra dan kerja sama menunggu persetujuan</p>

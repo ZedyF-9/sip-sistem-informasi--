@@ -37,13 +37,10 @@ return new class extends Migration
             $table->string('file_surat')->nullable();
 
             $table->enum('status', [
-                'menunggu_verifikasi',
                 'diverifikasi',
                 'disposisi',
-                'ditolak',
-                'spam',
                 'selesai',
-            ])->default('menunggu_verifikasi')->index();
+            ])->default('diverifikasi')->index();
 
             $table->foreignId('created_by')
                 ->nullable()

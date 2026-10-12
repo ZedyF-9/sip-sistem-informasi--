@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kerjasama extends Model
 {
@@ -36,6 +37,11 @@ class Kerjasama extends Model
     public function mitra(): BelongsTo
     {
         return $this->belongsTo(MitraIndustri::class, 'mitra_industri_id');
+    }
+
+    public function agendas(): HasMany
+    {
+        return $this->hasMany(AgendaKerjasama::class);
     }
 
     public function scopeBerlaku(Builder $query): Builder

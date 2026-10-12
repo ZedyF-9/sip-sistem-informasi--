@@ -87,9 +87,9 @@ class HapusDataController extends Controller
     {
         DB::transaction(function () use ($kegiatan) {
             $item = Kegiatan::query()->lockForUpdate()->findOrFail($kegiatan->id);
-            if ($item->sertifikats()->exists()) {
+            if ($item->sertifikats()->exists() || $item->pesertaPkls()->exists()) {
                 throw ValidationException::withMessages([
-                    'kegiatan' => 'Kegiatan yang sudah memiliki sertifikat tidak dapat dihapus.',
+                    'kegiatan' => 'Periode PKL yang sudah memiliki peserta tidak dapat dihapus.',
                 ]);
             }
             $item->delete();
@@ -112,7 +112,7 @@ class HapusDataController extends Controller
         $this->hapusBerkas($paths);
 
         return redirect()->route('tu.mitra.index')
-            ->with('status', 'Mitra beserta kerja sama, logo, dan dokumen MoU berhasil dihapus.');
+            ->with('status', 'Mitra beserta agenda, kerja sama lama, logo, dan dokumen MoU berhasil dihapus.');
     }
 
     private function hapusBerkas(array $paths): void

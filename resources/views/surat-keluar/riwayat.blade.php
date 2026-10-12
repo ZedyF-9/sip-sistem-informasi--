@@ -31,11 +31,16 @@
                     </summary>
                     <dl class="mt-3 space-y-2">
                         @foreach ($snapshot as $key => $value)
+                            @php
+                                $displayValue = is_array($value) || is_object($value)
+                                    ? json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                                    : $value;
+                            @endphp
                             <div>
                                 <dt class="text-slate-500">
                                     {{ ucwords(str_replace('_', ' ', $key)) }}
                                 </dt>
-                                <dd class="break-words">{{ $value ?: '—' }}</dd>
+                                <dd class="break-words whitespace-pre-wrap">{{ filled($displayValue) ? $displayValue : '—' }}</dd>
                             </div>
                         @endforeach
                     </dl>

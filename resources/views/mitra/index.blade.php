@@ -1,6 +1,6 @@
 @extends('layouts.internal')
 
-@section('title', 'Mitra dan Kerja Sama')
+@section('title', 'Mitra Industri')
 
 @section('content')
     <div class="mb-6 flex flex-wrap justify-between gap-4">
@@ -23,7 +23,7 @@
                     <th class="p-4">Bidang</th>
                     <th class="p-4">Status</th>
                     <th class="p-4">Persetujuan Waka Humas</th>
-                    <th class="p-4">Jumlah kerja sama</th>
+                    <th class="p-4">Jumlah agenda</th>
                     <th class="p-4">Aksi</th>
                 </tr>
             </thead>
@@ -34,12 +34,12 @@
                         <td class="p-4">{{ $item->bidang_usaha }}</td>
                         <td class="p-4">{{ ucfirst($item->status) }}</td>
                         <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan }}">{{ ucfirst($item->status_persetujuan) }}</span></td>
-                        <td class="p-4">{{ $item->kerjasamas_count }}</td>
+                        <td class="p-4">{{ $item->agendas_count }}</td>
                         <td class="p-4">
                             <a href="{{ route('tu.mitra.show', $item) }}"
                                class="font-semibold text-blue-700">Detail</a>
                             <x-hapus-data :action="route('tu.mitra.destroy', $item)" :label="$item->nama_mitra"
-                                :message="'Hapus mitra '.$item->nama_mitra.'? Semua kerja sama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
+                                :message="'Hapus mitra '.$item->nama_mitra.'? Semua agenda, kerja sama lama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
                         </td>
                     </tr>
                 @empty

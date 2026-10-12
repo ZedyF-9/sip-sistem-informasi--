@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
 use App\Models\Sertifikat;
+use App\Models\PesertaPkl;
 use App\Services\PenerbitSertifikat;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class SertifikatController extends Controller
@@ -16,35 +18,20 @@ class SertifikatController extends Controller
     public function store(
         Request $request,
         Kegiatan $kegiatan,
+        PesertaPkl $pesertaPkl,
         PenerbitSertifikat $penerbit
     ) {
-        $data = $request->validate([
-            'kode_peserta' => [
-                'required',
-                'string',
-                'max:100',
-                'regex:/^[A-Za-z0-9._-]+$/',
-            ],
-            'nama_penerima' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-            'peran' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-            'publikasi' => ['accepted'],
-        ], [
-            'kode_peserta.regex' => (
-                'Kode peserta hanya boleh berisi huruf, angka, '
-                .'titik, garis bawah, dan tanda minus.'
-            ),
-            'publikasi.accepted' => (
-                'Konfirmasi data yang ditampilkan pada verifikasi publik.'
-            ),
-        ]);
+        abort_unless((int) $pesertaPkl->kegiatan_id === (int) $kegiatan->id, 404);
+        abort_unless($pesertaPkl->status === 'selesai', 409, 'PKL siswa belum ditandai selesai.');
+
+        $data = [
+            'kode_peserta' => $pesertaPkl->nis,
+            'nama_penerima' => $pesertaPkl->nama,
+            'peran' => 'Siswa PKL',
+            'industri' => $pesertaPkl->nama_industri,
+            'kelas' => $pesertaPkl->kelas,
+            'jurusan' => $pesertaPkl->jurusan,
+        ];
 
         $penerbit->terbitkan(
             $kegiatan,
@@ -55,6 +42,93 @@ class SertifikatController extends Controller
         return redirect()
             ->route('tu.kegiatan.show', $kegiatan)
             ->with('status', 'Sertifikat PDF berhasil diterbitkan.');
+    }
+
+    public function bulkStore(
+        Request $request,
+        Kegiatan $kegiatan,
+        PenerbitSertifikat $penerbit
+    ) {
+        abort_if($kegiatan->tanggal_selesai->isFuture(), 422, 'Sertifikat dapat diterbitkan setelah periode PKL selesai.');
+        $group = $request->validate([
+            'berdasarkan' => ['required', Rule::in(['kelas', 'jurusan'])],
+            'nilai' => ['required', 'string', 'max:100'],
+        ]);
+
+        $peserta = $kegiatan->pesertaPkls()
+            ->where('status', 'selesai')
+            ->where($group['berdasarkan'], $group['nilai'])
+            ->get();
+        abort_if($peserta->isEmpty(), 422, 'Tidak ada siswa selesai pada kelompok ini.');
+        $sudahTerbit = $kegiatan->sertifikats()
+            ->where('status', 'aktif')
+            ->whereIn('kode_peserta', $peserta->pluck('nis'))
+            ->pluck('kode_peserta')
+            ->all();
+        $jumlah = 0;
+
+        foreach ($peserta as $item) {
+            if (in_array($item->nis, $sudahTerbit, true)) {
+                continue;
+            }
+
+            $penerbit->terbitkan($kegiatan, [
+                'kode_peserta' => $item->nis,
+                'nama_penerima' => $item->nama,
+                'peran' => 'Siswa PKL',
+                'industri' => $item->nama_industri,
+                'kelas' => $item->kelas,
+                'jurusan' => $item->jurusan,
+            ], $request->user()->id);
+            $jumlah++;
+        }
+
+        return redirect()->route('tu.kegiatan.show', $kegiatan)
+            ->with('status', $jumlah
+                ? $jumlah.' sertifikat berhasil diterbitkan untuk '.$group['berdasarkan'].' '.$group['nilai'].'.'
+                : 'Semua siswa pada kelompok ini sudah memiliki sertifikat aktif.');
+    }
+
+    public function downloadZip(Request $request, Kegiatan $kegiatan)
+    {
+        $data = $request->validate([
+            'kelas' => ['sometimes', 'required', 'string', 'max:100'],
+        ]);
+        $files = $kegiatan->sertifikats()
+            ->where('status', 'aktif')
+            ->whereNotNull('file_pdf');
+        if (isset($data['kelas'])) {
+            $files->whereIn('kode_peserta', $kegiatan->pesertaPkls()
+                ->where('kelas', $data['kelas'])->select('nis'));
+        }
+        $files = $files
+            ->get();
+        abort_if($files->isEmpty(), 404, 'Belum ada sertifikat aktif untuk diunduh.');
+
+        $zipPath = storage_path('app/exports/sertifikat-pkl-'.$kegiatan->id.'-'.uniqid().'.zip');
+        if (! is_dir(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0770, true);
+        }
+        $zip = new \ZipArchive();
+        abort_unless($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true, 500);
+        $disk = Storage::disk('local');
+        $added = 0;
+        foreach ($files as $file) {
+            if ($disk->exists($file->file_pdf)) {
+                $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->kode_peserta.'-'.$file->nomor).'.pdf';
+                $zip->addFile($disk->path($file->file_pdf), $name);
+                $added++;
+            }
+        }
+        $zip->close();
+        if ($added === 0) {
+            @unlink($zipPath);
+            abort(404, 'File PDF sertifikat tidak ditemukan.');
+        }
+
+        $kelasFile = isset($data['kelas']) ? '-'.preg_replace('/[^A-Za-z0-9._-]/', '-', $data['kelas']) : '-semua';
+        return response()->download($zipPath, 'sertifikat-'.$kegiatan->id.$kelasFile.'.zip')
+            ->deleteFileAfterSend(true);
     }
 
     public function download(Sertifikat $sertifikat)
@@ -132,10 +206,10 @@ class SertifikatController extends Controller
             'kode' => [
                 'required',
                 'string',
-                'regex:/^[a-f0-9]{64}$/',
+                'regex:/^(?:[0-9]{8}|[a-f0-9]{64})$/',
             ],
         ], [
-            'kode.regex' => 'Format kode verifikasi tidak sesuai.',
+            'kode.regex' => 'Masukkan kode angka 8 digit atau pindai QR sertifikat.',
         ]);
 
         return redirect()->route(
@@ -146,9 +220,9 @@ class SertifikatController extends Controller
 
     public function hasil(string $kode)
     {
-        $sertifikat = Sertifikat::query()
-            ->where('kode_verifikasi', $kode)
-            ->first();
+        $sertifikat = ctype_digit($kode) && strlen($kode) === 8
+            ? Sertifikat::query()->where('kode_cetak', $kode)->first()
+            : Sertifikat::query()->where('kode_verifikasi', $kode)->first();
 
         $hasil = [
             'status' => 'tidak_ditemukan',
@@ -165,6 +239,9 @@ class SertifikatController extends Controller
                     'nama' => $sertifikat->snapshot['nama_penerima'],
                     'kegiatan' => $sertifikat->snapshot['kegiatan'],
                     'peran' => $sertifikat->snapshot['peran'],
+                    'industri' => $sertifikat->snapshot['industri'] ?? null,
+                    'kelas' => $sertifikat->snapshot['kelas'] ?? null,
+                    'jurusan' => $sertifikat->snapshot['jurusan'] ?? null,
                     'tanggal' => $sertifikat->tanggal_terbit
                         ->format('d-m-Y'),
                 ];

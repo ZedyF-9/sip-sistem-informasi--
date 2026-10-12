@@ -56,7 +56,7 @@
 .dashboard-content .dashboard-badge,
 .dashboard-content span.rounded-full:not([aria-hidden]) { color: #525a63; background: var(--school-blue-soft); border-color: var(--school-line); border-radius: 5px; font-size: 11px; }
 .dashboard-content .dashboard-badge:is([data-status='disetujui'], [data-status='selesai'], [data-status='dikirim']) { color: #326146; background: #f0f5f1; border-color: #dae6dd; }
-.dashboard-content .dashboard-badge:is([data-status='diajukan'], [data-status='menunggu_verifikasi'], [data-status='diproses'], [data-status='menunggu']) { color: #795d28; background: #f8f5ed; border-color: #e9e1d0; }
+.dashboard-content .dashboard-badge:is([data-status='diajukan'], [data-status='diproses'], [data-status='menunggu']) { color: #795d28; background: #f8f5ed; border-color: #e9e1d0; }
 .dashboard-content .dashboard-badge:is([data-status='ditolak'], [data-status='spam'], [data-status='revisi']) { color: #924b4b; background: #faf1f1; border-color: #eddada; }
 .dashboard-content nav[aria-label='Pagination Navigation'] :where(a, span)[class*='bg-'] { color: #525a63; }
 .dashboard-content nav[aria-label='Pagination Navigation'] [aria-current='page'] > span { background: var(--school-blue-soft); color: var(--school-blue-deep); border-color: #cfd3d7; }

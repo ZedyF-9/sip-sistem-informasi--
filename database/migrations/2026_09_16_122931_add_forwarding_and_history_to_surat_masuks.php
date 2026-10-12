@@ -38,5 +38,6 @@ return new class extends Migration
         Schema::table('surat_masuks', function (Blueprint $table) {
             $table->dropColumn('diteruskan_at');
         });
+
     }
 };

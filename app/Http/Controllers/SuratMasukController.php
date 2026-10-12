@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SuratMasuk;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -21,12 +22,15 @@ class SuratMasukController extends Controller
         $q = trim($validated['q'] ?? '');
 
         $surats = SuratMasuk::query()
+            ->with('disposisis.penerima')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($search) use ($q) {
                     $search
                         ->where('nomor_registrasi', 'like', "%{$q}%")
+                        ->orWhere('nomor_agenda', 'like', "%{$q}%")
                         ->orWhere('nomor_surat', 'like', "%{$q}%")
                         ->orWhere('asal_surat', 'like', "%{$q}%")
+                        ->orWhere('keterangan', 'like', "%{$q}%")
                         ->orWhere('perihal', 'like', "%{$q}%");
                 });
             })
@@ -50,42 +54,13 @@ class SuratMasukController extends Controller
                 'string',
                 'max:100',
             ],
-            'jenis_surat' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-            'sifat_surat' => [
-                'required',
-                Rule::in(['biasa', 'penting', 'rahasia']),
-            ],
             'asal_surat' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'nama_pengirim' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'email_pengirim' => [
-                'nullable',
-                'email',
-                'max:255',
-            ],
+            'keterangan' => ['nullable', 'string', 'max:2000'],
             'perihal' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'nomor_agenda' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('surat_masuks', 'nomor_agenda'),
-            ],
-            'lokasi_arsip_fisik' => [
                 'required',
                 'string',
                 'max:255',
@@ -110,9 +85,7 @@ class SuratMasukController extends Controller
         ], [
             'required' => ':attribute wajib diisi.',
             'max' => ':attribute melebihi batas yang diizinkan.',
-            'email_pengirim.email' => 'Format email pengirim tidak valid.',
-            'sifat_surat.in' => 'Sifat surat tidak valid.',
-            'nomor_agenda.unique' => 'Nomor agenda sudah digunakan.',
+            'keterangan.max' => 'Keterangan maksimal 2.000 karakter.',
             'file_surat.file' => 'Unggahan harus berupa berkas.',
             'file_surat.mimes' => 'Berkas harus berupa PDF.',
             'file_surat.extensions' => 'Ekstensi berkas harus .pdf.',
@@ -124,14 +97,9 @@ class SuratMasukController extends Controller
                 'Tanggal diterima tidak boleh melewati hari ini.',
         ], [
             'nomor_surat' => 'Nomor surat',
-            'jenis_surat' => 'Jenis surat',
-            'sifat_surat' => 'Sifat surat',
             'asal_surat' => 'Asal surat',
-            'nama_pengirim' => 'Nama pengirim',
-            'email_pengirim' => 'Email pengirim',
+            'keterangan' => 'Keterangan',
             'perihal' => 'Perihal',
-            'nomor_agenda' => 'Nomor agenda',
-            'lokasi_arsip_fisik' => 'Lokasi arsip fisik',
             'tanggal_surat' => 'Tanggal surat',
             'tanggal_diterima' => 'Tanggal diterima',
             'file_surat' => 'Berkas surat',
@@ -150,12 +118,33 @@ class SuratMasukController extends Controller
 
         $data['file_surat'] = $path;
         $data['nomor_registrasi'] = 'SM-'.Str::ulid();
+        $data['jenis_surat'] = 'Surat Masuk';
+        $data['sifat_surat'] = 'biasa';
+        $data['nama_pengirim'] = $data['asal_surat'];
+        $data['email_pengirim'] = null;
         $data['metode_pengiriman'] = 'fisik';
-        $data['status'] = 'menunggu_verifikasi';
+        $data['status'] = 'diverifikasi';
         $data['created_by'] = $request->user()->id;
 
         try {
-            $surat = SuratMasuk::create($data);
+            $surat = DB::transaction(function () use ($data) {
+                $tahun = (int) date('Y', strtotime($data['tanggal_diterima']));
+                DB::table('nomor_agenda_tahunans')->insertOrIgnore([
+                    'tahun' => $tahun,
+                    'nomor_terakhir' => 0,
+                ]);
+                $sequence = DB::table('nomor_agenda_tahunans')
+                    ->where('tahun', $tahun)
+                    ->lockForUpdate()
+                    ->first();
+                $nomor = $sequence->nomor_terakhir + 1;
+                DB::table('nomor_agenda_tahunans')
+                    ->where('tahun', $tahun)
+                    ->update(['nomor_terakhir' => $nomor]);
+
+                $data['nomor_agenda'] = sprintf('%03d/TU/%d', $nomor, $tahun);
+                return SuratMasuk::create($data);
+            });
         } catch (Throwable $exception) {
             Storage::disk('local')->delete($path);
 
@@ -164,12 +153,12 @@ class SuratMasukController extends Controller
 
         return redirect()
             ->route('tu.surat-masuk.show', $surat)
-            ->with('status', 'Surat fisik berhasil dicatat.');
+            ->with('status', 'Surat masuk berhasil dicatat ke arsip.');
     }
 
     public function show(SuratMasuk $suratMasuk)
     {
-        $suratMasuk->load('pencatat');
+        $suratMasuk->load(['pencatat', 'disposisis.penerima']);
 
         return view('surat-masuk.show', [
             'surat' => $suratMasuk,

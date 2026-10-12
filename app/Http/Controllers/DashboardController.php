@@ -18,9 +18,18 @@ class DashboardController extends Controller
         return match ($user->role) {
             'koordinator_tu' => $this->tuDashboard(),
             'kepala_sekolah' => $this->kepalaDashboard(),
+            'kepala_tu' => $this->kepalaTuDashboard(),
             'waka_humas' => $this->wakaHumasDashboard(),
             default => $this->penerimaDashboard(),
         };
+    }
+
+    private function kepalaTuDashboard(): View
+    {
+        $menunggu = SuratKeluar::query()->where('status', 'menunggu_kepala_tu')->count();
+        return view('dashboard', [
+            'ringkasanKepalaTu' => ['menunggu' => $menunggu],
+        ]);
     }
 
     private function tuDashboard(): View
@@ -50,27 +59,41 @@ class DashboardController extends Controller
 
     private function kepalaDashboard(): View
     {
-        $suratDiverifikasi = SuratMasuk::query()->where('status', 'diverifikasi')->count();
+        $persetujuanDisposisi = Disposisi::query()
+            ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
+            ->whereHas('penerima', fn ($query) => $query->where('role', 'kepala_sekolah'))
+            ->count();
         $suratKeluarDiajukan = SuratKeluar::query()->where('status', 'diajukan')->count();
-        $disposisiAktif = Disposisi::query()->where('status', '!=', 'selesai')->count();
-        $totalTindakan = $suratDiverifikasi + $suratKeluarDiajukan + $disposisiAktif;
+        $suratKeluarMenunggu = SuratKeluar::query()
+            ->where('status', 'diajukan')
+            ->latest('id')
+            ->limit(5)
+            ->get();
+        $disposisiAktif = Disposisi::query()
+            ->where('status_persetujuan', 'disetujui')
+            ->whereHas('penerima', fn ($query) => $query->where('role', '!=', 'kepala_sekolah'))
+            ->where('status', '!=', 'selesai')->count();
+        $totalTindakan = $persetujuanDisposisi + $suratKeluarDiajukan + $disposisiAktif;
 
         return view('dashboard', [
             'ringkasan' => [
-                'surat_masuk' => $suratDiverifikasi,
+                'surat_masuk' => $persetujuanDisposisi,
                 'surat_keluar' => $suratKeluarDiajukan,
+                'surat_keluar_menunggu' => $suratKeluarMenunggu,
                 'disposisi_aktif' => $disposisiAktif,
                 'mitra_industri' => MitraIndustri::query()->count(),
                 'total_tindakan' => $totalTindakan,
                 'persen_surat' => $totalTindakan > 0
-                    ? round($suratDiverifikasi / $totalTindakan * 100, 1) : 0,
+                    ? round($persetujuanDisposisi / $totalTindakan * 100, 1) : 0,
                 'persen_keluar' => $totalTindakan > 0
                     ? round($suratKeluarDiajukan / $totalTindakan * 100, 1) : 0,
                 'persen_disposisi' => $totalTindakan > 0
                     ? round($disposisiAktif / $totalTindakan * 100, 1) : 0,
             ],
-            'suratTerbaru' => SuratMasuk::query()
-                ->where('status', 'diverifikasi')
+            'suratTerbaru' => Disposisi::query()
+                ->with('surat')
+                ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
+                ->whereHas('penerima', fn ($query) => $query->where('role', 'kepala_sekolah'))
                 ->latest('id')
                 ->limit(5)
                 ->get(),

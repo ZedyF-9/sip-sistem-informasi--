@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\KerjasamaController;
+use App\Http\Controllers\AgendaKerjasamaController;
+use App\Http\Controllers\AgendaMitraController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\MitraPublikController;
 use App\Http\Controllers\PersetujuanKerjasamaController;
@@ -31,6 +33,8 @@ Route::middleware(['auth', EnsureInternalAccess::class.':waka_humas'])
     ->name('waka-humas.kerjasama.')
     ->group(function () {
         Route::get('/', [PersetujuanKerjasamaController::class, 'index'])->name('index');
+        Route::get('/mitra/{mitra}/logo', [MitraController::class, 'logo'])
+            ->whereNumber('mitra')->name('mitra.logo');
         Route::patch('/mitra/{mitra}/setujui', [PersetujuanKerjasamaController::class, 'approveMitra'])
             ->whereNumber('mitra')->name('mitra.approve');
         Route::patch('/mitra/{mitra}/tolak', [PersetujuanKerjasamaController::class, 'rejectMitra'])
@@ -41,6 +45,10 @@ Route::middleware(['auth', EnsureInternalAccess::class.':waka_humas'])
             ->whereNumber('kerjasama')->name('reject');
         Route::get('/{kerjasama}/download', [PersetujuanKerjasamaController::class, 'download'])
             ->whereNumber('kerjasama')->name('download');
+        Route::get('/{kerjasama}', [AgendaKerjasamaController::class, 'show'])
+            ->whereNumber('kerjasama')->name('show');
+        Route::post('/{kerjasama}/agenda', [AgendaKerjasamaController::class, 'store'])
+            ->whereNumber('kerjasama')->name('agenda.store');
     });
 
 Route::middleware([
@@ -90,6 +98,11 @@ Route::middleware([
             ->whereNumber('mitra')
             ->name('mitra.logo');
 
+        Route::post('/mitra/{mitra}/agenda', [
+            AgendaMitraController::class,
+            'store',
+        ])->whereNumber('mitra')->name('mitra.agenda.store');
+
         Route::get('/mitra/{mitra}/kerjasama/create', [
             KerjasamaController::class,
             'create',
@@ -131,6 +144,16 @@ Route::middleware([
         ])
             ->whereNumber('kerjasama')
             ->name('kerjasama.download');
+
+        Route::get('/kerjasama/{kerjasama}', [
+            AgendaKerjasamaController::class,
+            'show',
+        ])->whereNumber('kerjasama')->name('kerjasama.show');
+
+        Route::post('/kerjasama/{kerjasama}/agenda', [
+            AgendaKerjasamaController::class,
+            'store',
+        ])->whereNumber('kerjasama')->name('kerjasama.agenda.store');
     });
 
 require __DIR__.'/akun.php';

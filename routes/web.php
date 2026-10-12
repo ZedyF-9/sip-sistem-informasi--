@@ -4,25 +4,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisposisiController;
-use App\Http\Controllers\PemeriksaanSuratController;
 use App\Http\Controllers\SuratMasukController;
-use App\Http\Controllers\SuratPublikController;
 use App\Http\Middleware\EnsureInternalAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
-Route::get('/kirim-surat', [SuratPublikController::class, 'create'])
-    ->name('publik.kirim');
-Route::post('/kirim-surat', [SuratPublikController::class, 'store'])
-    ->middleware('throttle:30,1')->name('publik.store');
-Route::get('/surat-terkirim', [SuratPublikController::class, 'berhasil'])
-    ->name('publik.berhasil');
-Route::get('/lacak-surat', [SuratPublikController::class, 'lacakForm'])
-    ->name('publik.lacak');
-Route::post('/lacak-surat', [SuratPublikController::class, 'lacak'])
-    ->middleware('throttle:20,1')->name('publik.lacak.submit');
+// Pengiriman dan pelacakan surat hanya dilakukan melalui sistem internal.
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
@@ -38,6 +27,7 @@ Route::middleware(['auth', EnsureInternalAccess::class])
         Route::get('/dashboard', function (Request $request) {
             return redirect()->route(match ($request->user()->role) {
                 'koordinator_tu' => 'tu.dashboard',
+                'kepala_tu' => 'kepala-tu.dashboard',
                 'kepala_sekolah' => 'kepala.dashboard',
                 'waka_humas' => 'waka-humas.dashboard',
                 'penerima_disposisi' => 'penerima.dashboard',
@@ -50,6 +40,9 @@ Route::middleware(['auth', EnsureInternalAccess::class])
         Route::get('/kepala/dashboard', [DashboardController::class, 'index'])
             ->middleware(EnsureInternalAccess::class.':kepala_sekolah')
             ->name('kepala.dashboard');
+        Route::get('/kepala-tu/dashboard', [DashboardController::class, 'index'])
+            ->middleware(EnsureInternalAccess::class.':kepala_tu')
+            ->name('kepala-tu.dashboard');
         Route::get('/penerima/dashboard', [DashboardController::class, 'index'])
             ->middleware(EnsureInternalAccess::class.':penerima_disposisi')
             ->name('penerima.dashboard');
@@ -74,48 +67,37 @@ Route::middleware([
         SuratMasukController::class, 'show',
     ])->name('surat-masuk.show');
 
-    Route::get('/pemeriksaan', [PemeriksaanSuratController::class, 'indexTu'])
-        ->name('pemeriksaan.index');
-    Route::get('/pemeriksaan/{suratMasuk}', [
-        PemeriksaanSuratController::class, 'showTu',
-    ])->name('pemeriksaan.show');
-    Route::patch('/pemeriksaan/{suratMasuk}', [
-        PemeriksaanSuratController::class, 'update',
-    ])->name('pemeriksaan.update');
-});
-
-Route::middleware([
-    'auth', EnsureInternalAccess::class.':kepala_sekolah',
-])->prefix('kepala')->name('kepala.')->group(function () {
-    Route::get('/surat', [PemeriksaanSuratController::class, 'indexKepala'])
-        ->name('surat.index');
-    Route::get('/surat/{suratMasuk}/download', [
-        PemeriksaanSuratController::class, 'downloadKepala',
-    ])->name('surat.download');
-    Route::get('/surat/{suratMasuk}', [
-        PemeriksaanSuratController::class, 'showKepala',
-    ])->name('surat.show');
 });
 
 Route::middleware(['auth', EnsureInternalAccess::class])
     ->prefix('disposisi')->name('disposisi.')
     ->group(function () {
         Route::get('/', [DisposisiController::class, 'index'])->name('index');
+        Route::get('/arsip', [DisposisiController::class, 'archive'])->name('archive');
         Route::get('/create', [DisposisiController::class, 'create'])
-            ->middleware(EnsureInternalAccess::class.':kepala_sekolah')
+            ->middleware(EnsureInternalAccess::class.':koordinator_tu')
             ->name('create');
         Route::post('/', [DisposisiController::class, 'store'])
-            ->middleware(EnsureInternalAccess::class.':kepala_sekolah')
+            ->middleware(EnsureInternalAccess::class.':koordinator_tu')
             ->name('store');
-        Route::get('/{disposisi}/surat', [
-            DisposisiController::class, 'downloadSurat',
-        ])->name('surat');
+        Route::patch('/{disposisi}/setujui', [DisposisiController::class, 'approve'])
+            ->middleware(EnsureInternalAccess::class.':kepala_sekolah')->name('approve');
+        Route::patch('/{disposisi}/tolak', [DisposisiController::class, 'reject'])
+            ->middleware(EnsureInternalAccess::class.':kepala_sekolah')->name('reject');
+        Route::patch('/{disposisi}/teruskan', [DisposisiController::class, 'issue'])
+            ->middleware(EnsureInternalAccess::class.':kepala_sekolah')->name('issue');
+        Route::get('/{disposisi}/surat-masuk', [
+            DisposisiController::class, 'downloadSuratMasuk',
+        ])->name('surat-masuk');
+        Route::get('/{disposisi}/lembar', [
+            DisposisiController::class, 'downloadLembar',
+        ])->name('lembar');
         Route::get('/{disposisi}/lampiran/{lampiran}', [
             DisposisiController::class, 'downloadLampiran',
         ])->whereNumber('lampiran')->name('lampiran');
         Route::post('/{disposisi}/tindak-lanjut', [
             DisposisiController::class, 'followUp',
-        ])->middleware(EnsureInternalAccess::class.':penerima_disposisi,waka_humas')
+        ])->middleware(EnsureInternalAccess::class.':kepala_sekolah,penerima_disposisi,waka_humas')
             ->name('tindak-lanjut');
         Route::get('/{disposisi}', [DisposisiController::class, 'show'])
             ->name('show');

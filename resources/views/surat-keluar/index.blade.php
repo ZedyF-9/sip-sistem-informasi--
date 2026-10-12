@@ -1,6 +1,11 @@
 @extends('layouts.internal')
 
-@section('title', request('status') === 'dikirim' ? 'Arsip Surat Keluar' : 'Surat Keluar')
+@section('title', match (auth()->user()->role) {
+    'kepala_tu' => 'Pemeriksaan Surat Keluar',
+    'kepala_sekolah' => 'Persetujuan Surat Keluar',
+    'koordinator_tu' => request('status') === 'dikirim' ? 'Arsip Surat Keluar' : 'Surat Keluar',
+    default => 'Surat Keluar',
+})
 
 @section('content')
     <section class="dashboard-data-panel" aria-label="Daftar data">
@@ -13,24 +18,22 @@
         </div>
     @endif
     <div class="mb-6 flex flex-wrap justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold">{{ match (auth()->user()->role) {
+                'kepala_tu' => 'Surat Menunggu Pemeriksaan',
+                'kepala_sekolah' => 'Surat Menunggu Persetujuan',
+                default => 'Buku Agenda Surat Keluar',
+            } }}</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ auth()->user()->role === 'kepala_sekolah'
+                ? 'Daftar surat yang telah lolos pemeriksaan Kepala TU dan diteruskan oleh TU.'
+                : 'Arsip surat yang dihasilkan otomatis dari format baku.' }}</p>
+        </div>
         <form method="GET" action="{{ route('surat-keluar.index') }}"
               class="dashboard-filter flex flex-wrap gap-3">
             <input name="q" value="{{ $q }}" maxlength="100"
                    aria-label="Cari surat"
                    placeholder="Cari nomor, perihal, atau tujuan"
                    class="rounded-xl border border-slate-300 bg-white p-3">
-
-            <select name="status" aria-label="Status"
-                    class="rounded-xl border border-slate-300 bg-white p-3">
-                <option value="">Semua status</option>
-                @foreach (['draf', 'diajukan', 'revisi', 'disetujui', 'dikirim'] as $value)
-                    @if ($value !== 'draf' || auth()->user()->role === 'koordinator_tu')
-                        <option value="{{ $value }}" @selected($status === $value)>
-                            {{ ucfirst($value) }}
-                        </option>
-                    @endif
-                @endforeach
-            </select>
 
             <button class="rounded-xl bg-blue-700 px-5 py-3 text-white">Cari</button>
         </form>
@@ -40,9 +43,11 @@
         <table class="w-full text-left text-sm">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="p-4">Nomor / Perihal</th>
-                    <th class="p-4">Tujuan</th>
+                    <th class="p-4">Nomor surat</th>
                     <th class="p-4">Tanggal</th>
+                    <th class="p-4">Alamat tujuan</th>
+                    <th class="p-4">Perihal</th>
+                    <th class="p-4">Keterangan</th>
                     <th class="p-4">Status</th>
                     <th class="p-4">Aksi</th>
                 </tr>
@@ -51,16 +56,23 @@
                 @forelse ($items as $item)
                     <tr>
                         <td class="p-4">
-                            <p class="font-semibold">{{ $item->perihal }}</p>
-                            <p class="mt-1 text-xs text-slate-500">
-                                {{ $item->nomor_surat ?: 'Belum bernomor' }}
-                            </p>
+                            {{ $item->nomor_surat ?: '—' }}
                         </td>
-                        <td class="p-4">{{ $item->tujuan }}</td>
                         <td class="whitespace-nowrap p-4">
                             {{ $item->tanggal_surat->format('d/m/Y') }}
                         </td>
-                        <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status }}">{{ ucfirst($item->status) }}</span></td>
+                        <td class="p-4">{{ $item->tujuan }}</td>
+                        <td class="p-4">{{ $item->perihal }}</td>
+                        <td class="p-4">{{ $item->keterangan ?: '—' }}</td>
+                        <td class="p-4">
+                            {{ match ($item->status) {
+                                'menunggu_kepala_tu' => 'Menunggu Kepala TU',
+                                'revisi' => 'Perlu revisi TU',
+                                'kembali_ke_tu' => 'Menunggu TU meneruskan',
+                                'diajukan' => 'Menunggu Kepala Sekolah',
+                                default => ucfirst($item->status),
+                            } }}
+                        </td>
                         <td class="p-4">
                             <a href="{{ route('surat-keluar.show', $item) }}"
                                class="font-semibold text-blue-700">Detail</a>
@@ -72,7 +84,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="p-10 text-center text-slate-500">
+                        <td colspan="7" class="p-10 text-center text-slate-500">
                             Tidak ada surat yang sesuai.
                         </td>
                     </tr>

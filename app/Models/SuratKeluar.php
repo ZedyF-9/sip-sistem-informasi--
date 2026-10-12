@@ -16,6 +16,8 @@ class SuratKeluar extends Model
         'sifat_surat',
         'tanggal_surat',
         'file_surat',
+        'keterangan',
+        'data_surat',
     ];
 
     protected function casts(): array
@@ -25,6 +27,7 @@ class SuratKeluar extends Model
             'approved_at' => 'datetime',
             'dikirim_at' => 'datetime',
             'version' => 'integer',
+            'data_surat' => 'array',
         ];
     }
 

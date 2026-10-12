@@ -15,7 +15,7 @@
     <main class="login-main">
         <section class="login-panel" aria-labelledby="login-title">
             <div class="login-identity">
-                <img src="{{ asset('reference/images.jpe') }}"
+                <img src="{{ asset('reference/image.jpg') }}"
                      alt="Logo SMKN 4 Tanjungpinang"
                      width="96" height="96" class="login-logo" fetchpriority="high">
                 <p class="login-school">SMKN 4 Tanjungpinang</p>

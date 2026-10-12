@@ -34,17 +34,14 @@
 
         <dl class="grid gap-6 md:grid-cols-2">
             @foreach ([
+                'Nomor urut / agenda' => $surat->nomor_agenda,
                 'Nomor surat' => $surat->nomor_surat,
-                'Jenis surat' => $surat->jenis_surat,
-                'Sifat surat' => ucfirst($surat->sifat_surat),
-                'Asal surat' => $surat->asal_surat,
-                'Nama pengirim' => $surat->nama_pengirim,
-                'Email pengirim' => $surat->email_pengirim,
-                'Metode pengiriman' => ucfirst($surat->metode_pengiriman),
-                'Nomor agenda' => $surat->nomor_agenda,
-                'Lokasi arsip fisik' => $surat->lokasi_arsip_fisik,
                 'Tanggal surat' => $surat->tanggal_surat->format('d/m/Y'),
                 'Tanggal diterima' => $surat->tanggal_diterima->format('d/m/Y'),
+                'Alamat asal (pengirim)' => $surat->asal_surat,
+                'Perihal' => $surat->perihal,
+                'Disposisi kepada' => $surat->disposisis->pluck('penerima.name')->filter()->unique()->implode(', ') ?: 'Belum didisposisikan',
+                'Keterangan' => $surat->keterangan,
                 'Dicatat oleh' => $surat->pencatat?->name,
             ] as $label => $value)
                 <div>

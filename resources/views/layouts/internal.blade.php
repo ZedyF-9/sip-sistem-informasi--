@@ -16,36 +16,38 @@
             'koordinator_tu' => [
                 ['Dashboard', 'tu.dashboard', []],
                 ['Surat Masuk', 'tu.surat-masuk.index', []],
-                ['Antrean Pemeriksaan', 'tu.pemeriksaan.index', []],
                 ['Pemantauan Disposisi', 'disposisi.index', []],
+                ['Arsip Disposisi', 'disposisi.archive', []],
                 ['Surat Keluar', 'surat-keluar.index', []],
-                ['Nomor Resmi', 'tu.nomor-resmi.index', []],
                 ['Arsip Surat Keluar', 'surat-keluar.index', ['status' => 'dikirim']],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
-                ['Mitra dan Kerja Sama', 'tu.mitra.index', []],
-                ['Kegiatan dan Sertifikat', 'tu.kegiatan.index', []],
+                ['Mitra Industri dan Agenda', 'tu.mitra.index', []],
+                ['PKL dan Sertifikat', 'tu.kegiatan.index', []],
                 ['Kelola Akun', 'tu.akun.index', []],
             ],
             'kepala_sekolah' => [
                 ['Dashboard', 'kepala.dashboard', []],
-                ['Surat dari TU', 'kepala.surat.index', []],
                 ['Pemantauan Disposisi', 'disposisi.index', []],
-                ['Persetujuan Surat Keluar', 'surat-keluar.index', ['status' => 'diajukan']],
+                ['Arsip Disposisi', 'disposisi.archive', []],
                 ['Surat Keluar', 'surat-keluar.index', []],
                 ['Cetak Laporan / PDF', 'laporan.cetak', []],
             ],
+            'kepala_tu' => [
+                ['Dashboard', 'kepala-tu.dashboard', []],
+                ['Pemeriksaan Surat Keluar', 'surat-keluar.index', []],
+            ],
             'waka_humas' => [
                 ['Dashboard', 'waka-humas.dashboard', []],
-                ['Persetujuan Mitra dan Kerja Sama', 'waka-humas.kerjasama.index', []],
+                ['Persetujuan Mitra Industri', 'waka-humas.kerjasama.index', []],
                 ['Disposisi Saya', 'disposisi.index', []],
                 ['Sedang Diproses', 'disposisi.index', ['status' => 'diproses']],
-                ['Disposisi Selesai', 'disposisi.index', ['status' => 'selesai']],
+                ['Arsip Disposisi', 'disposisi.archive', []],
             ],
             default => [
                 ['Dashboard', 'penerima.dashboard', []],
                 ['Disposisi Saya', 'disposisi.index', []],
                 ['Sedang Diproses', 'disposisi.index', ['status' => 'diproses']],
-                ['Disposisi Selesai', 'disposisi.index', ['status' => 'selesai']],
+                ['Arsip Disposisi', 'disposisi.archive', []],
             ],
         };
 
@@ -62,15 +64,14 @@
                     $module = str_ends_with($routeName, '.index') ? substr($routeName, 0, -6) : null;
                     $matchesPage = request()->routeIs($routeName)
                         || (! $hasExactMenu && $module && request()->routeIs($module.'.*'))
-                        || ($routeName === 'tu.mitra.index' && request()->routeIs('tu.kerjasama.*'))
-                        || ($routeName === 'tu.surat-masuk.index' && request()->routeIs('tu.perbaikan.*'));
+                        || ($routeName === 'tu.mitra.index' && request()->routeIs('tu.kerjasama.*'));
                     $statusMenus = collect($navigation)->where(1, $routeName)->pluck('2.status')->filter()->all();
                     $active = $matchesPage && (isset($parameters['status'])
                         ? request('status') === $parameters['status']
                         : ! in_array(request('status'), $statusMenus, true));
                     $icon = match (true) {
                         str_ends_with($routeName, '.dashboard') => 'grid',
-                        str_contains($routeName, 'surat-masuk'), str_contains($routeName, 'kepala.surat') => 'inbox',
+                        str_contains($routeName, 'surat-masuk') => 'inbox',
                         str_contains($routeName, 'surat-keluar') => 'send',
                         str_contains($routeName, 'laporan') => 'chart',
                         str_contains($routeName, 'akun') => 'user',

@@ -34,4 +34,14 @@ class MitraIndustri extends Model
     {
         return $this->hasMany(Kerjasama::class, 'mitra_industri_id');
     }
+
+    public function agendas(): HasMany
+    {
+        return $this->hasMany(AgendaMitra::class, 'mitra_industri_id');
+    }
+
+    public function pesertaPkls(): HasMany
+    {
+        return $this->hasMany(PesertaPkl::class, 'mitra_industri_id');
+    }
 }

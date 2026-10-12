@@ -13,7 +13,7 @@
     <header class="public-header">
         <div class="public-header-inner">
             <a href="{{ route('beranda') }}" class="dashboard-brand public-brand">
-                <img src="{{ asset('reference/images.jpe') }}" alt="Logo SMKN 4 Tanjungpinang"
+                <img src="{{ asset('reference/image.jpg') }}" alt="Logo SMKN 4 Tanjungpinang"
                      width="60" height="60" class="school-logo" fetchpriority="high">
                 <span><strong>SIP Sekolah</strong><small>SMKN 4 Tanjungpinang</small></span>
             </a>
@@ -21,8 +21,6 @@
             <nav aria-label="Navigasi publik" class="public-nav">
                 @foreach ([
                     ['Beranda', 'beranda', 'beranda'],
-                    ['Kirim Surat', 'publik.kirim', 'publik.kirim|publik.store|publik.berhasil'],
-                    ['Lacak Surat', 'publik.lacak', 'publik.lacak*'],
                     ['Mitra', 'publik.mitra.index', 'publik.mitra.*'],
                     ['Verifikasi Sertifikat', 'publik.sertifikat.form', 'publik.sertifikat.*'],
                 ] as [$label, $routeName, $pattern])
@@ -63,7 +61,7 @@
 
     <footer class="public-footer">
         <div class="public-footer-brand">
-            <img src="{{ asset('reference/images.jpe') }}" alt="" width="48" height="48" loading="lazy">
+            <img src="{{ asset('reference/image.jpg') }}" alt="" width="48" height="48" loading="lazy">
             <span><strong>SMKN 4 Tanjungpinang</strong><small>Sistem Informasi Persuratan</small></span>
         </div>
     </footer>
