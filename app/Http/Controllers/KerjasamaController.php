@@ -100,10 +100,11 @@ class KerjasamaController extends Controller
             'Dokumen MoU tidak ditemukan.'
         );
 
-        return $disk->download(
+        return $disk->response(
             $kerjasama->dokumen_mou,
             'mou-'.$kerjasama->id.'.pdf',
-            ['X-Content-Type-Options' => 'nosniff']
+            ['X-Content-Type-Options' => 'nosniff'],
+            'inline'
         );
     }
 

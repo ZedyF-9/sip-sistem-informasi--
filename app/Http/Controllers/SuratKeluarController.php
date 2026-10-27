@@ -469,10 +469,11 @@ class SuratKeluarController extends Controller
 
         abort_unless($disk->exists($path), 404);
 
-        return $disk->download(
+        return $disk->response(
             $path,
             $name,
-            ['X-Content-Type-Options' => 'nosniff']
+            ['X-Content-Type-Options' => 'nosniff'],
+            'inline'
         );
     }
 

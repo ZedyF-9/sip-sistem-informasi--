@@ -177,12 +177,13 @@ class SuratMasukController extends Controller
             'Berkas surat tidak ditemukan.'
         );
 
-        return $disk->download(
+        return $disk->response(
             $suratMasuk->file_surat,
             $suratMasuk->nomor_registrasi.'.pdf',
             [
                 'X-Content-Type-Options' => 'nosniff',
-            ]
+            ],
+            'inline'
         );
     }
 }

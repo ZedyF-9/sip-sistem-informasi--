@@ -87,7 +87,7 @@ class CetakLaporanController extends Controller
                 ->setOption('isRemoteEnabled', false)
                 ->setOption('isPhpEnabled', false)
                 ->setOption('isJavascriptEnabled', false)
-                ->download('laporan-'.$jenis.'-'.$mulai.'.pdf')
+                ->stream('laporan-'.$jenis.'-'.$mulai.'.pdf')
                 ->header('Cache-Control', 'private, no-store');
         }
 

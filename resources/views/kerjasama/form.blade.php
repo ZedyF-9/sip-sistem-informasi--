@@ -75,7 +75,7 @@
             @if ($kerjasama->dokumen_mou)
                 <a href="{{ route('tu.kerjasama.download', $kerjasama) }}"
                    class="mt-3 inline-block text-sm font-semibold text-blue-700">
-                    Unduh dokumen saat ini
+                    Lihat dokumen saat ini
                 </a>
                 <p class="mt-2 text-sm text-slate-500">
                     Kosongkan unggahan untuk mempertahankan dokumen.

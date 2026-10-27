@@ -9,9 +9,9 @@
             Kembali
         </a>
 
-        <a href="{{ route('disposisi.surat-masuk', $disposisi) }}" class="rounded-xl bg-blue-700 px-5 py-3 text-white">Unduh PDF Asli Surat Masuk</a>
+        <a href="{{ route('disposisi.surat-masuk', $disposisi) }}" class="rounded-xl bg-blue-700 px-5 py-3 text-white">Lihat PDF Asli Surat Masuk</a>
         @if ($disposisi->penerima->role !== 'kepala_sekolah')
-            <a href="{{ route('disposisi.lembar', $disposisi) }}" class="rounded-xl border border-blue-700 px-5 py-3 text-blue-700">Unduh Lembar Disposisi</a>
+            <a href="{{ route('disposisi.lembar', $disposisi) }}" class="rounded-xl border border-blue-700 px-5 py-3 text-blue-700">Lihat Lembar Disposisi</a>
         @endif
     </div>
 
@@ -211,7 +211,7 @@
                             'lampiran' => $riwayat->id,
                         ]) }}"
                            class="mt-3 inline-block text-sm font-semibold text-blue-700">
-                            Unduh Lampiran Hasil
+                            Lihat Lampiran Hasil
                         </a>
                     @endif
                 </article>

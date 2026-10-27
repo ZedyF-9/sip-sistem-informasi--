@@ -12,7 +12,7 @@
         @if ($surat->file_surat)
             <a href="{{ route('tu.surat-masuk.download', $surat) }}"
                class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">
-                Unduh PDF
+                Lihat PDF
             </a>
         @endif
     </div>

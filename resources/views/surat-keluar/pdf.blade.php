@@ -8,7 +8,7 @@
         p { margin: 8pt 0; }
         .kop { width: 100%; border-collapse: collapse; border-bottom: 3px double #111; margin-bottom: 13pt; }
         .kop td { vertical-align: middle; padding: 0 4pt 6pt; }
-        .kop img { width: 56pt; height: 56pt; }
+        .kop img { display: block; width: auto; height: auto; max-width: 68pt; max-height: 68pt; margin: 0 auto; }
         .kop .center { text-align: center; line-height: 1.22; }
         .province { font-size: 9pt; }
         .department { font-size: 11pt; font-weight: bold; }

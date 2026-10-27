@@ -455,7 +455,7 @@ class DisposisiController extends Controller
             'disposisi', 'logoKepri', 'logoSekolah'
         ))
             ->setPaper('a4', 'landscape')
-            ->download('lembar-disposisi-'.$disposisi->id.'.pdf');
+            ->stream('lembar-disposisi-'.$disposisi->id.'.pdf');
     }
 
     public function downloadLampiran(
@@ -501,10 +501,11 @@ class DisposisiController extends Controller
 
         abort_unless($path && $disk->exists($path), 404);
 
-        return $disk->download(
+        return $disk->response(
             $path,
             $name,
-            ['X-Content-Type-Options' => 'nosniff']
+            ['X-Content-Type-Options' => 'nosniff'],
+            'inline'
         );
     }
 

@@ -8,7 +8,7 @@
            class="rounded-xl border border-slate-300 bg-white px-5 py-3">Kembali</a>
         @if ($kerjasama->dokumen_mou)
             <a href="{{ route($routePrefix.'.download', $kerjasama) }}"
-               class="rounded-xl bg-blue-700 px-5 py-3 text-white">Unduh MoU</a>
+               class="rounded-xl bg-blue-700 px-5 py-3 text-white">Lihat MoU</a>
         @endif
     </div>
 

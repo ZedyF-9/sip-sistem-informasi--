@@ -86,10 +86,11 @@ class PersetujuanKerjasamaController extends Controller
     {
         abort_unless($kerjasama->dokumen_mou && Storage::disk('local')->exists($kerjasama->dokumen_mou), 404);
 
-        return Storage::disk('local')->download(
+        return Storage::disk('local')->response(
             $kerjasama->dokumen_mou,
             'mou-'.$kerjasama->id.'.pdf',
             ['X-Content-Type-Options' => 'nosniff'],
+            'inline'
         );
     }
 }

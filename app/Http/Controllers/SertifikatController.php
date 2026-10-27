@@ -23,6 +23,15 @@ class SertifikatController extends Controller
     ) {
         abort_unless((int) $pesertaPkl->kegiatan_id === (int) $kegiatan->id, 404);
         abort_unless($pesertaPkl->status === 'selesai', 409, 'PKL siswa belum ditandai selesai.');
+        $input = $request->validate([
+            'predikat' => [
+                'required',
+                Rule::in(array_keys(PenerbitSertifikat::PREDIKAT)),
+            ],
+        ], [
+            'predikat.required' => 'Pilih predikat sebelum menerbitkan sertifikat.',
+            'predikat.in' => 'Pilih predikat Biasa, Baik, atau Sangat Baik.',
+        ]);
         $this->pastikanDataLahirTersedia($pesertaPkl);
 
         $data = [
@@ -34,6 +43,7 @@ class SertifikatController extends Controller
             'industri' => $pesertaPkl->nama_industri,
             'kelas' => $pesertaPkl->kelas,
             'jurusan' => $pesertaPkl->jurusan,
+            'predikat' => $input['predikat'],
         ];
 
         $penerbit->terbitkan(
@@ -56,6 +66,13 @@ class SertifikatController extends Controller
         $group = $request->validate([
             'berdasarkan' => ['required', Rule::in(['kelas', 'jurusan'])],
             'nilai' => ['required', 'string', 'max:100'],
+            'predikat' => [
+                'required',
+                Rule::in(array_keys(PenerbitSertifikat::PREDIKAT)),
+            ],
+        ], [
+            'predikat.required' => 'Pilih predikat sebelum menerbitkan sertifikat.',
+            'predikat.in' => 'Pilih predikat Biasa, Baik, atau Sangat Baik.',
         ]);
 
         $peserta = $kegiatan->pesertaPkls()
@@ -91,6 +108,7 @@ class SertifikatController extends Controller
                 'industri' => $item->nama_industri,
                 'kelas' => $item->kelas,
                 'jurusan' => $item->jurusan,
+                'predikat' => $group['predikat'],
             ], $request->user()->id);
             $jumlah++;
         }
@@ -172,13 +190,14 @@ class SertifikatController extends Controller
             $penerbit->perbaruiPdf($sertifikat);
         }
 
-        return $disk->download(
+        return $disk->response(
             $sertifikat->file_pdf,
             'sertifikat-'.$sertifikat->id.'.pdf',
             [
                 'X-Content-Type-Options' => 'nosniff',
                 'Cache-Control' => 'private, no-store',
-            ]
+            ],
+            'inline'
         );
     }
 

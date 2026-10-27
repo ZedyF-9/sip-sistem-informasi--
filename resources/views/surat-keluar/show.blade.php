@@ -13,7 +13,7 @@
            class="rounded-xl border border-slate-300 bg-white px-5 py-3">Kembali</a>
 
         <a href="{{ route('surat-keluar.download', $surat) }}"
-           class="rounded-xl bg-blue-700 px-5 py-3 text-white">Unduh PDF</a>
+           class="rounded-xl bg-blue-700 px-5 py-3 text-white">Lihat PDF</a>
 
     </div>
 

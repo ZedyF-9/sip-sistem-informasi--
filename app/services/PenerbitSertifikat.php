@@ -19,17 +19,35 @@ use Throwable;
 
 class PenerbitSertifikat
 {
+    public const PREDIKAT = [
+        'BIASA' => 'Biasa',
+        'BAIK' => 'Baik',
+        'SANGAT BAIK' => 'Sangat Baik',
+    ];
+
     public function terbitkan(
         Kegiatan $kegiatan,
         array $data,
         int $userId
     ): Sertifikat {
+        $predikat = $data['predikat'] ?? null;
+
+        if (
+            ! is_string($predikat)
+            || ! array_key_exists($predikat, self::PREDIKAT)
+        ) {
+            throw ValidationException::withMessages([
+                'predikat' => 'Pilih predikat Biasa, Baik, atau Sangat Baik sebelum menerbitkan sertifikat.',
+            ]);
+        }
+
         $path = null;
 
         try {
             return DB::transaction(function () use (
                 $kegiatan,
                 $data,
+                $predikat,
                 $userId,
                 &$path
             ) {
@@ -108,7 +126,7 @@ class PenerbitSertifikat
                         ->format('d-m-Y'),
                     'nama_penerima' => $data['nama_penerima'],
                     'peran' => $data['peran'],
-                    'predikat' => $data['predikat'] ?? 'SANGAT BAIK',
+                    'predikat' => $predikat,
                     'tempat_lahir' => $data['tempat_lahir'] ?? null,
                     'tanggal_lahir' => ! empty($data['tanggal_lahir'])
                         ? CarbonImmutable::parse($data['tanggal_lahir'])

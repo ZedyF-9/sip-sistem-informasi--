@@ -51,7 +51,7 @@
                     'riwayat' => $item->id,
                 ]) }}"
                    class="mt-3 inline-block text-sm font-semibold text-blue-700">
-                    Unduh PDF versi ini
+                    Lihat PDF versi ini
                 </a>
             </article>
         @empty

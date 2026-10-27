@@ -161,6 +161,16 @@
                 @csrf
                 <input type="hidden" name="berdasarkan" value="kelas">
                 <label for="terbitkan-kelas" class="mb-2 block text-sm font-semibold text-slate-700">Terbitkan sertifikat satu kelas</label>
+                <div class="mb-3">
+                    <label for="predikat-kelas" class="mb-1 block text-sm font-medium text-slate-700">Predikat sertifikat</label>
+                    <select id="predikat-kelas" name="predikat" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60" @disabled(! $kegiatan->tanggal_selesai->isPast() || $kelasList->isEmpty())>
+                        <option value="" disabled @selected(old('predikat') === null)>Pilih predikat</option>
+                        @foreach (\App\Services\PenerbitSertifikat::PREDIKAT as $value => $label)
+                            <option value="{{ $value }}" @selected(old('predikat') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-slate-500">Predikat ini digunakan untuk semua sertifikat siswa selesai di kelas yang dipilih.</p>
+                </div>
                 <div class="flex flex-col gap-2 sm:flex-row">
                     <select id="terbitkan-kelas" name="nilai" required class="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60" @disabled(! $kegiatan->tanggal_selesai->isPast() || $kelasList->isEmpty())>
                         <option value="" selected disabled>Pilih kelas dari Excel</option>
@@ -218,12 +228,19 @@
                         <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status }}">{{ ucfirst($item->status) }}</span></td>
                         <td class="p-4">
                             @if ($item->sertifikat?->status === 'aktif')
-                                <a href="{{ route('tu.sertifikat.download', $item->sertifikat) }}" class="font-semibold text-blue-700">Unduh PDF</a>
+                                <a href="{{ route('tu.sertifikat.download', $item->sertifikat) }}" class="font-semibold text-blue-700">Lihat PDF</a>
                                 <span class="mx-1 text-slate-300">·</span>
                                 <a href="{{ route('publik.sertifikat.hasil', $item->sertifikat->kode_verifikasi) }}" target="_blank" rel="noopener" class="text-blue-700">Verifikasi</a>
                             @elseif ($item->status === 'selesai' && $kegiatan->tanggal_selesai->isPast())
-                                <form action="{{ route('tu.sertifikat.store', [$kegiatan, $item]) }}" method="POST" class="inline">
+                                <form action="{{ route('tu.sertifikat.store', [$kegiatan, $item]) }}" method="POST" class="flex flex-col items-start gap-2">
                                     @csrf
+                                    <label for="predikat-{{ $item->id }}" class="sr-only">Pilih predikat untuk sertifikat {{ $item->nama }}</label>
+                                    <select id="predikat-{{ $item->id }}" name="predikat" required class="max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15">
+                                        <option value="" disabled @selected(old('predikat') === null)>Pilih predikat</option>
+                                        @foreach (\App\Services\PenerbitSertifikat::PREDIKAT as $value => $label)
+                                            <option value="{{ $value }}" @selected(old('predikat') === $value)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
                                     <button class="font-semibold text-blue-700">Terbitkan Sertifikat</button>
                                 </form>
                             @else

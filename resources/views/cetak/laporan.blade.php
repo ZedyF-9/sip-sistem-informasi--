@@ -28,7 +28,7 @@
 
                 <div class="flex flex-wrap gap-3 md:col-span-3">
                     <button name="format" value="html" class="rounded-xl bg-blue-700 px-5 py-3 text-white">Tampilkan</button>
-                    <button name="format" value="pdf" class="rounded-xl border border-slate-300 px-5 py-3">Unduh PDF</button>
+                    <button name="format" value="pdf" class="rounded-xl border border-slate-300 px-5 py-3">Lihat PDF</button>
                     <button type="button" onclick="window.print()" class="rounded-xl border border-slate-300 px-5 py-3">Cetak</button>
                 </div>
             </form>
