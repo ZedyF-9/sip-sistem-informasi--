@@ -23,17 +23,18 @@
     <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
         <table class="w-full text-left text-sm">
             <thead class="bg-slate-50"><tr>
-                <th class="p-4">Baris</th><th class="p-4">NIS / NISN</th><th class="p-4">Nama</th><th class="p-4">Kelas</th><th class="p-4">Jurusan</th><th class="p-4">Industri</th>
+                <th class="p-4">Baris</th><th class="p-4">NIS / NISN</th><th class="p-4">Nama</th><th class="p-4">Tempat Lahir</th><th class="p-4">Tanggal Lahir</th><th class="p-4">Kelas</th><th class="p-4">Jurusan</th><th class="p-4">Industri</th><th class="p-4">Aksi</th>
             </tr></thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($preview['rows'] as $row)
                     <tr>
                         <td class="p-4">{{ $row['baris'] }}</td><td class="p-4">{{ $row['nis'] }}</td>
-                        <td class="p-4">{{ $row['nama'] }}</td><td class="p-4">{{ $row['kelas'] }}</td><td class="p-4">{{ $row['jurusan'] ?: '—' }}</td>
+                        <td class="p-4">{{ $row['nama'] }}</td><td class="p-4">{{ $row['tempat_lahir'] ?: '—' }}</td><td class="p-4">{{ $row['tanggal_lahir'] ? \Carbon\CarbonImmutable::parse($row['tanggal_lahir'])->locale('id')->translatedFormat('d F Y') : '—' }}</td><td class="p-4">{{ $row['kelas'] }}</td><td class="p-4">{{ $row['jurusan'] ?: '—' }}</td>
                         <td class="p-4">{{ $row['nama_industri'] }}</td>
+                        <td class="p-4">{{ $row['is_update'] ? 'Perbarui data lahir' : 'Siswa baru' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="p-8 text-center text-slate-500">Tidak ada baris yang siap diimpor.</td></tr>
+                    <tr><td colspan="9" class="p-8 text-center text-slate-500">Tidak ada baris yang siap diimpor.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -54,7 +55,7 @@
                 </div>
             </fieldset>
             <div class="flex gap-3">
-            <button class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Impor kelas terpilih ({{ count($preview['rows']) }} siswa)</button>
+            <button class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Impor / perbarui kelas terpilih ({{ count($preview['rows']) }} siswa)</button>
             <a href="{{ route('tu.kegiatan.show', $kegiatan) }}" class="rounded-xl border border-slate-300 px-5 py-3">Batal</a>
             </div>
         </form>

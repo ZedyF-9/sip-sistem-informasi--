@@ -32,8 +32,8 @@
     <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 class="text-lg font-bold">Impor Daftar Siswa dari Excel</h2>
         <p class="mt-2 text-sm leading-6 text-slate-600">
-            Gunakan file .xlsx dengan kolom <code>nis</code>, <code>nama_lengkap</code>, <code>kelas</code>, dan <code>industri</code>.
-            Kolom pribadi lain pada template siswa boleh tetap ada; sistem hanya mengambil empat kolom tersebut.
+            Gunakan file .xlsx dengan kolom <code>nis</code>, <code>nama_lengkap</code>, <code>tempat_lahir</code>, <code>tanggal_lahir</code>, <code>kelas</code>, dan <code>industri</code>. Tempat dan tanggal lahir wajib diisi agar tercetak pada sertifikat.
+            Jika NIS sudah terdaftar, impor hanya memperbarui data lahir dan mempertahankan data lainnya.
             Nama industri diambil langsung dari kolom Excel dan tidak perlu terdaftar sebagai mitra kerja sama.
         </p>
         <form action="{{ route('tu.kegiatan.import.preview', $kegiatan) }}" method="POST"

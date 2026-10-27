@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use SimpleXMLElement;
@@ -58,7 +59,7 @@ class PembacaExcelPkl
                 }
                 if ($rowNumber === 1) {
                     foreach ($values as $index => $name) {
-                        $header[$index] = Str::lower(trim((string) $name));
+                        $header[$index] = $this->normalisasiNamaKolom((string) $name);
                     }
                     continue;
                 }
@@ -72,6 +73,11 @@ class PembacaExcelPkl
                     'nis' => trim((string) ($this->valueFor($values, $header, 'nisn')
                         ?: $this->valueFor($values, $header, 'nis'))),
                     'nama' => trim((string) $this->valueFor($values, $header, 'nama_lengkap')),
+                    'tempat_lahir' => trim((string) $this->valueFor($values, $header, 'tempat_lahir')),
+                    'tanggal_lahir' => $this->tanggalLahir(
+                        trim((string) $this->valueFor($values, $header, 'tanggal_lahir')),
+                        $rowNumber
+                    ),
                     'kelas' => $kelas,
                     'jurusan' => $jurusan !== '' ? $jurusan : $this->jurusanDariKelas($kelas),
                     'industri' => trim((string) $this->valueFor($values, $header, 'industri')),
@@ -83,7 +89,9 @@ class PembacaExcelPkl
                 }
             }
 
-            foreach (['nama_lengkap', 'kelas', 'industri'] as $required) {
+            foreach ([
+                'nama_lengkap', 'tempat_lahir', 'tanggal_lahir', 'kelas', 'industri',
+            ] as $required) {
                 if (! in_array($required, $header, true)) {
                     throw ValidationException::withMessages([
                         'file_excel' => 'Kolom wajib tidak ditemukan: '.$required.'.',
@@ -145,8 +153,74 @@ class PembacaExcelPkl
 
     private function valueFor(array $values, array $header, string $name): string
     {
-        $index = array_search($name, $header, true);
-        return $index === false ? '' : (string) ($values[$index] ?? '');
+        $aliases = match ($name) {
+            'tempat_lahir' => [
+                'tempat_lahir', 'tempat',
+            ],
+            'tanggal_lahir' => [
+                'tanggal_lahir', 'tgl_lahir',
+            ],
+            default => [$name],
+        };
+
+        foreach ($aliases as $alias) {
+            $index = array_search(
+                $this->normalisasiNamaKolom($alias),
+                $header,
+                true
+            );
+            if ($index !== false) {
+                return (string) ($values[$index] ?? '');
+            }
+        }
+
+        return '';
+    }
+
+    private function tanggalLahir(string $value, int $rowNumber): ?string
+    {
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            if (is_numeric($value)) {
+                $serial = (float) $value;
+                if ($serial < 10000 || $serial > 100000) {
+                    throw new \InvalidArgumentException();
+                }
+
+                return CarbonImmutable::create(1899, 12, 30)
+                    ->addDays((int) $serial)
+                    ->format('Y-m-d');
+            }
+
+            foreach ([
+                '!d/m/Y', '!d-m-Y', '!d.m.Y', '!Y-m-d',
+                '!d/m/y', '!d-m-y', '!d.m.y',
+            ] as $format) {
+                $date = \DateTimeImmutable::createFromFormat($format, $value);
+                $errors = \DateTimeImmutable::getLastErrors();
+
+                if (
+                    $date !== false
+                    && ($errors === false || (
+                        $errors['warning_count'] === 0
+                        && $errors['error_count'] === 0
+                    ))
+                ) {
+                    return $date->format('Y-m-d');
+                }
+            }
+
+            return CarbonImmutable::parseFromLocale($value, 'id')
+                ->format('Y-m-d');
+        } catch (\Throwable) {
+            throw ValidationException::withMessages([
+                'file_excel' => 'Tanggal lahir pada baris '.$rowNumber
+                    .' tidak valid. Gunakan tanggal yang sah.',
+            ]);
+        }
     }
 
     private function jurusanDariKelas(string $kelas): string
@@ -156,6 +230,17 @@ class PembacaExcelPkl
         }
 
         return '';
+    }
+
+    private function normalisasiNamaKolom(string $name): string
+    {
+        $normalized = preg_replace(
+            '/[^a-z0-9]+/',
+            '_',
+            Str::lower(trim($name))
+        );
+
+        return trim((string) $normalized, '_');
     }
 
     private function columnIndex(string $column): int

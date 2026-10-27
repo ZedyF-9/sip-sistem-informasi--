@@ -23,11 +23,14 @@ class SertifikatController extends Controller
     ) {
         abort_unless((int) $pesertaPkl->kegiatan_id === (int) $kegiatan->id, 404);
         abort_unless($pesertaPkl->status === 'selesai', 409, 'PKL siswa belum ditandai selesai.');
+        $this->pastikanDataLahirTersedia($pesertaPkl);
 
         $data = [
             'kode_peserta' => $pesertaPkl->nis,
             'nama_penerima' => $pesertaPkl->nama,
             'peran' => 'Siswa PKL',
+            'tempat_lahir' => $pesertaPkl->tempat_lahir,
+            'tanggal_lahir' => $pesertaPkl->tanggal_lahir,
             'industri' => $pesertaPkl->nama_industri,
             'kelas' => $pesertaPkl->kelas,
             'jurusan' => $pesertaPkl->jurusan,
@@ -65,6 +68,13 @@ class SertifikatController extends Controller
             ->whereIn('kode_peserta', $peserta->pluck('nis'))
             ->pluck('kode_peserta')
             ->all();
+
+        foreach ($peserta as $item) {
+            if (! in_array($item->nis, $sudahTerbit, true)) {
+                $this->pastikanDataLahirTersedia($item);
+            }
+        }
+
         $jumlah = 0;
 
         foreach ($peserta as $item) {
@@ -76,6 +86,8 @@ class SertifikatController extends Controller
                 'kode_peserta' => $item->nis,
                 'nama_penerima' => $item->nama,
                 'peran' => 'Siswa PKL',
+                'tempat_lahir' => $item->tempat_lahir,
+                'tanggal_lahir' => $item->tanggal_lahir,
                 'industri' => $item->nama_industri,
                 'kelas' => $item->kelas,
                 'jurusan' => $item->jurusan,
@@ -89,7 +101,11 @@ class SertifikatController extends Controller
                 : 'Semua siswa pada kelompok ini sudah memiliki sertifikat aktif.');
     }
 
-    public function downloadZip(Request $request, Kegiatan $kegiatan)
+    public function downloadZip(
+        Request $request,
+        Kegiatan $kegiatan,
+        PenerbitSertifikat $penerbit
+    )
     {
         $data = $request->validate([
             'kelas' => ['sometimes', 'required', 'string', 'max:100'],
@@ -115,6 +131,10 @@ class SertifikatController extends Controller
         $added = 0;
         foreach ($files as $file) {
             if ($disk->exists($file->file_pdf)) {
+                if ($penerbit->sinkronkanDataLahir($file)) {
+                    $penerbit->perbaruiPdf($file);
+                }
+
                 $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->kode_peserta.'-'.$file->nomor).'.pdf';
                 $zip->addFile($disk->path($file->file_pdf), $name);
                 $added++;
@@ -131,7 +151,10 @@ class SertifikatController extends Controller
             ->deleteFileAfterSend(true);
     }
 
-    public function download(Sertifikat $sertifikat)
+    public function download(
+        Sertifikat $sertifikat,
+        PenerbitSertifikat $penerbit
+    )
     {
         abort_unless($sertifikat->status === 'aktif', 404);
 
@@ -144,6 +167,10 @@ class SertifikatController extends Controller
             404,
             'PDF sertifikat tidak ditemukan.'
         );
+
+        if ($penerbit->sinkronkanDataLahir($sertifikat)) {
+            $penerbit->perbaruiPdf($sertifikat);
+        }
 
         return $disk->download(
             $sertifikat->file_pdf,
@@ -239,6 +266,9 @@ class SertifikatController extends Controller
                     'nama' => $sertifikat->snapshot['nama_penerima'],
                     'kegiatan' => $sertifikat->snapshot['kegiatan'],
                     'peran' => $sertifikat->snapshot['peran'],
+                    'predikat' => $sertifikat->snapshot['predikat'] ?? 'SANGAT BAIK',
+                    'tempat_lahir' => $sertifikat->snapshot['tempat_lahir'] ?? null,
+                    'tanggal_lahir' => $sertifikat->snapshot['tanggal_lahir'] ?? null,
                     'industri' => $sertifikat->snapshot['industri'] ?? null,
                     'kelas' => $sertifikat->snapshot['kelas'] ?? null,
                     'jurusan' => $sertifikat->snapshot['jurusan'] ?? null,
@@ -253,5 +283,14 @@ class SertifikatController extends Controller
             ->header('Cache-Control', 'no-store')
             ->header('Referrer-Policy', 'no-referrer')
             ->header('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    private function pastikanDataLahirTersedia(PesertaPkl $pesertaPkl): void
+    {
+        if (empty($pesertaPkl->tempat_lahir) || empty($pesertaPkl->tanggal_lahir)) {
+            throw ValidationException::withMessages([
+                'tanggal_lahir' => 'Data tempat/tanggal lahir belum tersimpan. Unggah ulang file Excel yang berisi kolom tersebut, lalu impor/perbarui data sebelum menerbitkan sertifikat.',
+            ]);
+        }
     }
 }

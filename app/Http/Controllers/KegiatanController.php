@@ -198,23 +198,30 @@ class KegiatanController extends Controller
                     $issues[] = $label.' wajib diisi.';
                 }
             }
+            if ($row['tempat_lahir'] === '') {
+                $issues[] = 'Tempat lahir wajib diisi.';
+            }
+            if ($row['tanggal_lahir'] === null) {
+                $issues[] = 'Tanggal lahir wajib diisi.';
+            }
             if ($row['nis'] !== '' && (! preg_match('/^[A-Za-z0-9._-]+$/', $row['nis']) || strlen($row['nis']) > 50)) {
                 $issues[] = 'NIS hanya boleh memakai huruf, angka, titik, garis bawah, atau tanda minus (maksimal 50 karakter).';
             }
             if (mb_strlen($row['nama']) > 100 || mb_strlen($row['kelas']) > 100) {
                 $issues[] = 'Nama maksimal 100 karakter dan kelas maksimal 100 karakter.';
             }
+            if (mb_strlen($row['tempat_lahir']) > 100) {
+                $issues[] = 'Tempat lahir maksimal 100 karakter.';
+            }
             if ($row['nis'] !== '' && isset($seen[$row['nis']])) {
                 $issues[] = 'NIS duplikat di dalam file.';
-            }
-            if (in_array($row['nis'], $existing, true)) {
-                $issues[] = 'NIS sudah terdaftar pada periode PKL ini.';
             }
             $seen[$row['nis']] = true;
 
             if ($issues === []) {
                 $validRows[] = $row + [
                     'nama_industri' => $row['industri'],
+                    'is_update' => in_array($row['nis'], $existing, true),
                 ];
             } else {
                 $errors[] = ['baris' => $row['baris'], 'nis' => $row['nis'], 'nama' => $row['nama'], 'pesan' => implode(' ', $issues)];
@@ -249,27 +256,61 @@ class KegiatanController extends Controller
         abort_if(array_diff($kelasDipilih, $kelasTersedia), 422, 'Pilihan kelas tidak sesuai dengan pratinjau impor.');
         $rows = array_values(array_filter($rows, fn ($row) => in_array($row['kelas'], $kelasDipilih, true)));
 
-        DB::transaction(function () use ($kegiatan, $rows) {
+        $hasilImpor = DB::transaction(function () use ($kegiatan, $rows) {
+            $jumlahBaru = 0;
+            $jumlahDataLahir = 0;
+
             foreach ($rows as $row) {
-                if ($kegiatan->pesertaPkls()->where('nis', $row['nis'])->exists()) {
-                    throw ValidationException::withMessages([
-                        'file_excel' => 'NIS '.$row['nis'].' sudah terdaftar. Tidak ada baris yang diimpor.',
-                    ]);
+                $peserta = $kegiatan->pesertaPkls()
+                    ->where('nis', $row['nis'])
+                    ->first();
+
+                if ($peserta !== null) {
+                    $dataLahir = [];
+                    if (
+                        $row['tempat_lahir'] !== ''
+                        && $row['tempat_lahir'] !== $peserta->tempat_lahir
+                    ) {
+                        $dataLahir['tempat_lahir'] = $row['tempat_lahir'];
+                    }
+                    if (
+                        $row['tanggal_lahir'] !== null
+                        && $row['tanggal_lahir'] !== $peserta->tanggal_lahir
+                    ) {
+                        $dataLahir['tanggal_lahir'] = $row['tanggal_lahir'];
+                    }
+
+                    if ($dataLahir !== []) {
+                        $peserta->update($dataLahir);
+                        $jumlahDataLahir++;
+                    }
+
+                    continue;
                 }
+
                 PesertaPkl::create([
                     'kegiatan_id' => $kegiatan->id,
                     'nis' => $row['nis'],
                     'nama' => $row['nama'],
+                    'tempat_lahir' => $row['tempat_lahir'],
+                    'tanggal_lahir' => $row['tanggal_lahir'],
                     'kelas' => $row['kelas'],
                     'jurusan' => $row['jurusan'],
                     'nama_industri' => $row['nama_industri'],
                 ]);
+                $jumlahBaru++;
             }
+
+            return [
+                'baru' => $jumlahBaru,
+                'data_lahir' => $jumlahDataLahir,
+            ];
         });
 
         session()->forget('pkl_import_preview_'.$kegiatan->id);
         return redirect()->route('tu.kegiatan.show', $kegiatan)
-            ->with('status', count($rows).' siswa berhasil diimpor ke periode PKL.');
+            ->with('status', $hasilImpor['baru'].' siswa baru diimpor, '
+                .$hasilImpor['data_lahir'].' data tempat/tanggal lahir diperbarui.');
     }
 
     public function completeParticipant(Request $request, Kegiatan $kegiatan, PesertaPkl $pesertaPkl)

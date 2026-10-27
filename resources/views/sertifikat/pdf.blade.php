@@ -6,34 +6,44 @@
     <style>
         @page { margin: 0; }
         * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; width: 841.89pt; height: 563.15pt; font-family: "DejaVu Sans", sans-serif; color: #30343b; }
-        .page { position: relative; width: 841.89pt; height: 563.15pt; overflow: hidden; }
-        .background { position: absolute; inset: 0; width: 841.89pt; height: 563.15pt; }
-        .watermark { position: absolute; left: 326pt; top: 213pt; width: 190pt; height: 190pt; opacity: .10; }
-        .logo { position: absolute; top: 30pt; width: 65pt; height: 72pt; object-fit: contain; }
-        .logo-kepri { left: 49pt; }
-        .logo-school { right: 48pt; }
-        .title { position: absolute; top: 22pt; left: 140pt; width: 562pt; text-align: center; font-family: "DejaVu Serif", serif; font-weight: bold; font-size: 42pt; line-height: 1.08; }
-        .number { position: absolute; top: 112pt; left: 175pt; width: 492pt; text-align: center; font-size: 10pt; }
-        .presented { position: absolute; top: 145pt; left: 200pt; width: 442pt; text-align: center; font-size: 11pt; }
-        .recipient { position: absolute; top: 174pt; left: 95pt; width: 652pt; text-align: center; font-family: "DejaVu Serif", serif; font-size: 22pt; font-style: italic; font-weight: bold; text-transform: uppercase; }
-        .details { position: absolute; top: 225pt; left: 210pt; width: 430pt; font-size: 10pt; line-height: 16pt; }
-        .details table { width: 100%; border-collapse: collapse; }
-        .details td { vertical-align: top; }
-        .details .label { width: 142pt; }
-        .details .colon { width: 12pt; }
-        .description { position: absolute; top: 328pt; left: 95pt; width: 652pt; text-align: center; font-size: 11pt; line-height: 17pt; }
-        .signer { position: absolute; top: 405pt; width: 250pt; text-align: center; font-size: 9pt; line-height: 13pt; }
-        .signer-left { left: 48pt; }
-        .signer-right { right: 48pt; }
+        html, body { margin: 0; padding: 0; width: 841.89pt; height: 588.76pt; font-family: "DejaVu Sans", sans-serif; color: #30343b; }
+        .page { position: relative; width: 841.89pt; height: 588.76pt; overflow: hidden; }
+        .background { position: absolute; inset: 0; width: 841.89pt; height: 588.76pt; }
+        .watermark { position: absolute; left: 306pt; top: 197.5pt; width: 230pt; height: 221pt; opacity: .24; }
+        .logo { position: absolute; top: 35pt; width: 104pt; height: auto; }
+        .logo-kepri { left: 50pt; }
+        .logo-school { right: 58pt; }
+        .title { position: absolute; top: 32pt; left: 140pt; width: 562pt; text-align: center; font-family: "DejaVu Serif", serif; font-weight: bold; font-size: 66pt; line-height: 1.08; }
+        .number { position: absolute; top: 128pt; left: 175pt; width: 492pt; text-align: center; font-size: 10pt; }
+        .presented { position: absolute; top: 164pt; left: 200pt; width: 442pt; text-align: center; font-size: 10pt; }
+        .recipient { position: absolute; top: 200pt; left: 95pt; width: 652pt; text-align: center; font-family: "DejaVu Serif", serif; font-size: 26.5pt; font-style: italic; font-weight: normal; text-transform: uppercase; }
+        .certificate-copy { position: absolute; top: 259pt; left: 0; width: 841.89pt; }
+        .details { position: static; width: 400pt; min-height: 63pt; margin-left: 240pt; font-size: 13pt; line-height: 21pt; }
+        .details table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .details td { vertical-align: top; font-size: 13pt; line-height: 21pt; }
+        .details .label { width: 138pt; white-space: nowrap; }
+        .details .colon { width: 8pt; text-align: center; }
+        .details td:last-child { width: 254pt; word-wrap: break-word; overflow-wrap: break-word; }
+        .details tr:nth-child(2) td:last-child { white-space: nowrap; }
+        .description { position: static; width: 592pt; margin: 12pt 0 0 125pt; text-align: center; }
+        .description-intro { font-size: 14pt; line-height: 20pt; }
+        .description-result { font-size: 12pt; line-height: 20pt; }
+        .description .industry { font-weight: normal; text-transform: uppercase; }
+        .description strong { font-weight: bold; text-transform: uppercase; }
+        .signatures { position: relative; height: 124pt; margin-top: 17pt; }
+        .signer { position: absolute; top: 0; width: 250pt; text-align: center; font-size: 9pt; line-height: 13pt; }
+        .signer-left { left: 48pt; text-align: left; }
+        .signer-right { right: 18pt; width: 205pt; text-align: left; }
+        .signer-right .signer-role { font-size: 8pt; line-height: 12pt; }
         .signer-role { min-height: 28pt; }
-        .signer-space { height: 68pt; }
-        .signer-name { font-weight: bold; text-decoration: underline; }
-        .manual-signature-name { width: 175pt; height: 14pt; margin: 0 auto 3pt; border-bottom: 1px solid #30343b; }
-        .signature-stamp { position: absolute; left: 111pt; top: 430pt; width: 94pt; height: 76pt; opacity: .77; }
-        .motto { position: absolute; left: 354pt; top: 420pt; width: 134pt; height: 115pt; object-fit: contain; }
+        .signer-space { position: relative; height: 68pt; }
+        .signature-line { position: absolute; bottom: 0; left: 50%; width: 175pt; margin-left: -87.5pt; border-bottom: 1px solid #30343b; }
+        .signer-left .signature-line { left: 0; margin-left: 0; }
+        .signer-right .signer-space { position: absolute; top: 28pt; left: 0; right: 30pt; height: 68pt; }
+        .signer-right .signature-line { left: 0; right: auto; margin-left: 0; }
+        .signer-name { font-weight: bold; }
+        .motto { position: absolute; left: 365pt; top: 425pt; width: 112pt; height: 120pt; object-fit: contain; }
         .qr { position: absolute; right: 15pt; bottom: 14pt; width: 35pt; height: 35pt; }
-        .verification { position: absolute; right: 55pt; bottom: 16pt; width: 130pt; text-align: right; color: #9299a3; opacity: .42; font-size: 6.5pt; letter-spacing: 1pt; }
     </style>
 </head>
 <body>
@@ -44,42 +54,58 @@
         <img class="logo logo-school" src="{{ $logoSekolah }}" alt="Lambang SMKN 4 Tanjungpinang">
 
         <div class="title">Sertifikat</div>
-        <div class="number">Nomor: {{ $sertifikat->nomor }}</div>
-        <div class="presented">Diberikan kepada</div>
+        <div class="number">Nomor : {{ $sertifikat->nomor }}</div>
+        <div class="presented">Diberikan Kepada</div>
         <div class="recipient">{{ $snapshot['nama_penerima'] }}</div>
 
+        <div class="certificate-copy">
         <div class="details">
             <table>
-                <tr><td class="label">Nomor Induk Siswa</td><td class="colon">:</td><td>{{ $snapshot['nis'] ?? $sertifikat->kode_peserta }}</td></tr>
-                @if (!empty($snapshot['kelas']))<tr><td>Kelas</td><td>:</td><td>{{ $snapshot['kelas'] }}</td></tr>@endif
-                @if (!empty($snapshot['jurusan']))<tr><td>Konsentrasi Keahlian</td><td>:</td><td>{{ $snapshot['jurusan'] }}</td></tr>@endif
-                @if (!empty($snapshot['industri']))<tr><td>Tempat PKL</td><td>:</td><td>{{ $snapshot['industri'] }}</td></tr>@endif
-                <tr><td>Periode PKL</td><td>:</td><td>{{ $snapshot['tanggal_mulai'] }} s.d. {{ $snapshot['tanggal_selesai'] }}</td></tr>
+                <tr>
+                    <td class="label">Nomor Induk Siswa</td>
+                    <td class="colon">:</td>
+                    <td>{{ $snapshot['nis'] ?? $sertifikat->kode_peserta }}</td>
+                </tr>
+                <tr>
+                        <td class="label">Tempat / Tgl. Lahir</td>
+                        <td class="colon">:</td>
+                    <td>{{ ($snapshot['tempat_lahir'] ?? null) ?: '—' }} / {{ ($snapshot['tanggal_lahir'] ?? null) ?: '—' }}</td>
+                </tr>
+                @if (!empty($snapshot['jurusan']))
+                    <tr>
+                            <td class="label">Konsentrasi Keahlian</td>
+                            <td class="colon">:</td>
+                        <td>{{ $snapshot['jurusan'] }}</td>
+                    </tr>
+                @endif
             </table>
         </div>
 
         <div class="description">
-            Telah selesai mengikuti Praktik Kerja Lapangan (PKL)
-            @if (!empty($snapshot['industri'])) pada <strong>{{ $snapshot['industri'] }}</strong>@endif
-            pada periode {{ $snapshot['tanggal_mulai'] }} sampai dengan {{ $snapshot['tanggal_selesai'] }}.
+            <div class="description-intro">Telah selesai mengikuti Praktik Kerja Lapangan (PKL) pada</div>
+            <div class="description-result">
+                @if (!empty($snapshot['industri']))<span class="industry">{{ $snapshot['industri'] }}</span> @endif
+                dengan Predikat <strong>{{ $snapshot['predikat'] ?? 'SANGAT BAIK' }}</strong>
+            </div>
         </div>
 
-        <div class="signer signer-left">
-            <div class="signer-role">KEPALA<br>SMK NEGERI 4 TANJUNGPINANG</div>
-            <div class="signer-space"></div>
-            <div class="signer-name">Yayuk Sri Mulyani Rahayu, S.Pd., M.M.</div>
-            NIP 19770421 200502 2 011
+        <div class="signatures">
+            <div class="signer signer-left">
+                <div class="signer-role">KEPALA<br>SMK NEGERI 4 TANJUNGPINANG</div>
+                <div class="signer-space"><div class="signature-line"></div></div>
+                <div class="signer-name">Yayuk Sri Mulyani Rahayu, S.Pd., M.M.</div>
+                NIP 19770421 200502 2 011
+            </div>
+
+            <div class="signer signer-right">
+                <div class="signer-role">KEPALA<br>{{ $snapshot['industri'] ?? '' }}</div>
+                <div class="signer-space"><div class="signature-line"></div></div>
+            </div>
         </div>
-        <img class="signature-stamp" src="{{ $stempel }}" alt="Stempel dan tanda tangan kepala sekolah">
+        </div>
 
         <img class="motto" src="{{ $motto }}" alt="SMK Bisa, SMK Hebat">
 
-        <div class="signer signer-right">
-            <div class="signer-space"></div>
-            <div class="manual-signature-name"></div>
-        </div>
-
-        <div class="verification">Kode verifikasi: {{ $sertifikat->kode_cetak }}</div>
         <img class="qr" src="{{ $qr }}" alt="QR verifikasi sertifikat">
     </div>
 </body>
