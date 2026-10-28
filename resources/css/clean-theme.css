@@ -200,8 +200,19 @@
     .public-brand > span { min-width: 0; }
     .public-brand strong { font-size: 14px; }
     .public-brand small { font-size: 10px; letter-spacing: .1px; white-space: nowrap; }
-    .public-header-actions { gap: 5px; }
-    .public-header-actions .public-account-link { min-height: 38px; padding: 7px 9px; font-size: 11px; }
+    .public-header-actions { justify-self: end; gap: 5px; }
+    .public-header-actions .public-account-link {
+        min-width: 96px;
+        min-height: 38px;
+        padding: 6px 9px;
+        border: 1px solid var(--school-line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--school-blue);
+        font-size: 11px;
+        white-space: nowrap;
+    }
+    .public-header-actions .public-account-link:hover { border-color: #b6cbd9; background: #f3f7fa; color: var(--school-blue-deep); }
     .public-header-actions .dashboard-logout { min-height: 38px; padding: 7px 9px; font-size: 11px; }
     .public-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 6px 0; }
     .public-nav-link { min-height: 42px; padding: 6px 4px; font-size: 11px; line-height: 1.25; text-align: center; white-space: normal; }
@@ -213,4 +224,8 @@
     .public-content a.dashboard-quick-card { padding: 17px 0; }
     .public-content article.rounded-2xl { padding: 18px; }
     .public-content > .mx-auto > section.rounded-2xl { padding: 18px; }
+}
+@media (max-width: 359px) {
+    .public-header-inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "actions" "nav"; }
+    .public-header-actions { justify-self: end; padding-block: 2px 6px; }
 }
