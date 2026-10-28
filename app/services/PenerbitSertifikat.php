@@ -19,6 +19,8 @@ use Throwable;
 
 class PenerbitSertifikat
 {
+    private const VERIFICATION_URL_BASE = 'https://sip.tefa.smkn4tpi.sch.id/verifikasi-sertifikat/';
+
     public const PREDIKAT = [
         'BIASA' => 'Biasa',
         'BAIK' => 'Baik',
@@ -234,13 +236,8 @@ class PenerbitSertifikat
 
     private function renderPdf(Sertifikat $sertifikat): string
     {
-        $verificationBaseUrl = config(
-            'services.certificate_verification_base_url'
-        ) ?: 'https://sip.tefa.smkn4tpi.sch.id';
-        $verificationUrl = rtrim(
-            $verificationBaseUrl,
-            '/'
-        ).'/verifikasi-sertifikat/'.$sertifikat->kode_verifikasi;
+        $verificationUrl = self::VERIFICATION_URL_BASE
+            .$sertifikat->kode_verifikasi;
 
         $renderer = new ImageRenderer(
             new RendererStyle(240, 4),

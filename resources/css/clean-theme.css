@@ -97,6 +97,7 @@
 .role-summary-report-link { border: 0; border-top: 1px solid var(--dashboard-line); border-radius: 0; background: none; color: var(--school-blue); padding: 18px 0 0; font-size: 13px; font-weight: 600; }
 .role-summary-report-link:hover { background: none; border-color: var(--dashboard-line); text-decoration: underline; text-underline-offset: 3px; }
 .public-shell { background: #fff; }
+.public-header-inner, .public-brand, .public-nav, .public-header-actions, .public-content { min-width: 0; }
 .public-nav-link { color: #535b63; }
 .public-nav-link:hover, .public-nav-link[aria-current='page'] { color: var(--school-blue-deep); background: var(--school-blue-soft); border-color: transparent; }
 .public-header-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
@@ -150,6 +151,10 @@
 }
 @media (max-width: 767px) {
     .public-content { padding-top: 20px; }
+    .public-content > .mx-auto { width: 100%; }
+    .public-content :where(h1, h2, h3, p, dt, dd) { overflow-wrap: anywhere; }
+    .public-content img { max-width: 100%; }
+    .public-content > section.bg-blue-950 > div { padding: clamp(18px, 4.8vw, 24px); }
     .public-content .public-hero {
         min-height: 0;
         gap: 22px;

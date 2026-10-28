@@ -2,10 +2,6 @@
 
 return [
 
-    'certificate_verification_base_url' => env(
-        'CERTIFICATE_VERIFICATION_BASE_URL'
-    ) ?: 'https://sip.tefa.smkn4tpi.sch.id',
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
