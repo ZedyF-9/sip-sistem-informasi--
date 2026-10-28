@@ -116,7 +116,7 @@
             </div>
         @endif
 
-        <img class="qr" src="{{ $qr }}" alt="QR verifikasi sertifikat">
+        <img class="qr" src="{{ $qr }}" alt="QR menuju portal verifikasi sertifikat">
     </div>
 </body>
 </html>

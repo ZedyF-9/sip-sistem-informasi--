@@ -236,15 +236,13 @@ class PenerbitSertifikat
 
     private function renderPdf(Sertifikat $sertifikat): string
     {
-        $verificationUrl = self::VERIFICATION_URL_BASE
-            .$sertifikat->kode_verifikasi;
-
         $renderer = new ImageRenderer(
             new RendererStyle(240, 4),
             new SvgImageBackEnd()
         );
 
         $writer = new Writer($renderer);
+        $verificationUrl = self::VERIFICATION_URL_BASE.$sertifikat->kode_verifikasi;
         $svg = $writer->writeString($verificationUrl);
         $qr = 'data:image/svg+xml;base64,'.base64_encode($svg);
         $template = 'data:image/png;base64,'.base64_encode(file_get_contents(
