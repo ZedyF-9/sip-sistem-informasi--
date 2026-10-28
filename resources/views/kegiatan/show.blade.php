@@ -144,7 +144,7 @@
             <p class="mt-1 text-sm text-slate-500">Pilihan kelas dibaca dari Excel yang sudah diimpor. Penerbitan hanya mencakup siswa berstatus selesai.</p>
         </div>
         <div class="grid gap-4 lg:grid-cols-2">
-            <form action="{{ route('tu.kegiatan.kelas.complete', $kegiatan) }}" method="POST" class="rounded-lg bg-slate-50 p-4">
+            <form id="form-selesaikan-kelas" action="{{ route('tu.kegiatan.kelas.complete', $kegiatan) }}" method="POST" class="rounded-lg bg-slate-50 p-4">
                 @csrf
                 @method('PATCH')
                 <label for="selesai-kelas" class="mb-2 block text-sm font-semibold text-slate-700">Tandai PKL selesai sekaligus per kelas</label>
@@ -157,7 +157,7 @@
                 </div>
                 <p class="mt-2 text-xs text-slate-500">Pilih kelas, lalu klik tombol untuk mengubah status semua siswa yang masih berlangsung di kelas itu menjadi selesai.</p>
             </form>
-            <form action="{{ route('tu.kegiatan.sertifikat.bulk', $kegiatan) }}" method="POST" class="rounded-lg bg-slate-50 p-4">
+            <form id="form-terbitkan-kelas" action="{{ route('tu.kegiatan.sertifikat.bulk', $kegiatan) }}" method="POST" class="rounded-lg bg-slate-50 p-4">
                 @csrf
                 <input type="hidden" name="berdasarkan" value="kelas">
                 <label for="terbitkan-kelas" class="mb-2 block text-sm font-semibold text-slate-700">Terbitkan sertifikat satu kelas</label>
@@ -219,7 +219,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($peserta as $item)
-                    <tr>
+                    <tr id="peserta-{{ $item->id }}">
                         <td class="p-4">{{ $item->nis }}</td>
                         <td class="p-4 font-semibold">{{ $item->nama }}</td>
                         <td class="p-4">{{ $item->kelas }}</td>

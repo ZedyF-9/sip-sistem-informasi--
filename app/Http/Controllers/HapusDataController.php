@@ -10,7 +10,6 @@ use App\Models\SuratMasuk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 
 class HapusDataController extends Controller
 {
@@ -85,17 +84,37 @@ class HapusDataController extends Controller
 
     public function kegiatan(Kegiatan $kegiatan)
     {
-        DB::transaction(function () use ($kegiatan) {
+        $dataTerhapus = DB::transaction(function () use ($kegiatan) {
             $item = Kegiatan::query()->lockForUpdate()->findOrFail($kegiatan->id);
-            if ($item->sertifikats()->exists() || $item->pesertaPkls()->exists()) {
-                throw ValidationException::withMessages([
-                    'kegiatan' => 'Periode PKL yang sudah memiliki peserta tidak dapat dihapus.',
-                ]);
-            }
-            $item->delete();
-        });
 
-        return redirect()->route('tu.kegiatan.index')->with('status', 'Agenda/kegiatan berhasil dihapus.');
+            $sertifikats = $item->sertifikats()
+                ->lockForUpdate()
+                ->get(['id', 'file_pdf']);
+
+            $peserta = $item->pesertaPkls()
+                ->lockForUpdate()
+                ->get(['id']);
+
+            $paths = $sertifikats->pluck('file_pdf')->all();
+
+            $item->sertifikats()->delete();
+            $item->pesertaPkls()->delete();
+            $item->delete();
+
+            return [
+                'paths' => $paths,
+                'peserta' => $peserta->count(),
+                'sertifikat' => $sertifikats->count(),
+            ];
+        });
+        $this->hapusBerkas($dataTerhapus['paths']);
+
+        return redirect()->route('tu.kegiatan.index')->with(
+            'status',
+            'Sesi PKL berhasil dihapus bersama '
+                .$dataTerhapus['peserta'].' data siswa dan '
+                .$dataTerhapus['sertifikat'].' sertifikat.'
+        );
     }
 
     public function mitra(MitraIndustri $mitra)

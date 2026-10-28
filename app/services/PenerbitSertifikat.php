@@ -234,8 +234,13 @@ class PenerbitSertifikat
 
     private function renderPdf(Sertifikat $sertifikat): string
     {
-        $verificationUrl = rtrim(config('app.url'), '/').'/verifikasi-sertifikat/'
-            .$sertifikat->kode_verifikasi;
+        $verificationBaseUrl = config(
+            'services.certificate_verification_base_url'
+        ) ?: 'https://sip.tefa.smkn4tpi.sch.id';
+        $verificationUrl = rtrim(
+            $verificationBaseUrl,
+            '/'
+        ).'/verifikasi-sertifikat/'.$sertifikat->kode_verifikasi;
 
         $renderer = new ImageRenderer(
             new RendererStyle(240, 4),

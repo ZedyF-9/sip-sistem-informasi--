@@ -322,7 +322,9 @@ class KegiatanController extends Controller
             ]);
         }
         $pesertaPkl->update(['status' => 'selesai']);
-        return back()->with('status', 'Status PKL '.$pesertaPkl->nama.' diperbarui menjadi selesai.');
+        return back()
+            ->withFragment('peserta-'.$pesertaPkl->id)
+            ->with('status', 'Status PKL '.$pesertaPkl->nama.' diperbarui menjadi selesai.');
     }
 
     public function completeClass(Request $request, Kegiatan $kegiatan)
@@ -330,9 +332,11 @@ class KegiatanController extends Controller
         $data = $request->validate(['kelas' => ['required', 'string', 'max:100']]);
         $jumlah = $kegiatan->pesertaPkls()->where('kelas', $data['kelas'])
             ->where('status', 'berlangsung')->update(['status' => 'selesai', 'updated_at' => now()]);
-        return back()->with('status', $jumlah
-            ? $jumlah.' siswa kelas '.$data['kelas'].' ditandai selesai.'
-            : 'Tidak ada siswa berlangsung pada kelas tersebut.');
+        return back()
+            ->withFragment('form-selesaikan-kelas')
+            ->with('status', $jumlah
+                ? $jumlah.' siswa kelas '.$data['kelas'].' ditandai selesai.'
+                : 'Tidak ada siswa berlangsung pada kelas tersebut.');
     }
 
     public function removeParticipant(Kegiatan $kegiatan, PesertaPkl $pesertaPkl)

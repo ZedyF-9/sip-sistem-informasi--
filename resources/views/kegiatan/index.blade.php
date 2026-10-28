@@ -67,12 +67,11 @@
                             >
                                 Kelola
                             </a>
-                            @if ($kegiatan->sertifikats_count === 0 && $kegiatan->peserta_pkls_count === 0)
-                                <x-hapus-data :action="route('tu.kegiatan.destroy', $kegiatan)" :label="$kegiatan->nama"
-                                    :message="'Hapus periode PKL '.$kegiatan->nama.' secara permanen?'" />
-                            @else
-                                <p class="mt-2 text-xs text-slate-500">Memiliki siswa atau sertifikat; tidak dapat dihapus.</p>
-                            @endif
+                            <x-hapus-data
+                                :action="route('tu.kegiatan.destroy', $kegiatan)"
+                                :label="$kegiatan->nama"
+                                :message="'Yakin menghapus sesi PKL '.$kegiatan->nama.'? '.$kegiatan->peserta_pkls_count.' data siswa, '.$kegiatan->sertifikats_count.' sertifikat, dan PDF terkait akan dihapus permanen. Tautan verifikasi QR tidak akan berlaku lagi.'"
+                            />
                         </td>
                     </tr>
                 @empty

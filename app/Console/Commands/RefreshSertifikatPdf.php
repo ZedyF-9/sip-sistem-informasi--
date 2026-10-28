@@ -12,7 +12,7 @@ class RefreshSertifikatPdf extends Command
         {--id=* : Perbarui hanya sertifikat dengan ID tertentu}
         {--force : Lewati konfirmasi untuk memperbarui semua PDF}';
 
-    protected $description = 'Membuat ulang PDF sertifikat dengan template terbaru';
+    protected $description = 'Membuat ulang PDF sertifikat dengan template dan tautan verifikasi terbaru';
 
     public function handle(PenerbitSertifikat $penerbit): int
     {

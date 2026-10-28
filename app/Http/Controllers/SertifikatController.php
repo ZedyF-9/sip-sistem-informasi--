@@ -52,8 +52,8 @@ class SertifikatController extends Controller
             $request->user()->id
         );
 
-        return redirect()
-            ->route('tu.kegiatan.show', $kegiatan)
+        return back()
+            ->withFragment('peserta-'.$pesertaPkl->id)
             ->with('status', 'Sertifikat PDF berhasil diterbitkan.');
     }
 
@@ -113,7 +113,8 @@ class SertifikatController extends Controller
             $jumlah++;
         }
 
-        return redirect()->route('tu.kegiatan.show', $kegiatan)
+        return back()
+            ->withFragment('form-terbitkan-kelas')
             ->with('status', $jumlah
                 ? $jumlah.' sertifikat berhasil diterbitkan untuk '.$group['berdasarkan'].' '.$group['nilai'].'.'
                 : 'Semua siswa pada kelompok ini sudah memiliki sertifikat aktif.');
@@ -149,9 +150,8 @@ class SertifikatController extends Controller
         $added = 0;
         foreach ($files as $file) {
             if ($disk->exists($file->file_pdf)) {
-                if ($penerbit->sinkronkanDataLahir($file)) {
-                    $penerbit->perbaruiPdf($file);
-                }
+                $penerbit->sinkronkanDataLahir($file);
+                $penerbit->perbaruiPdf($file);
 
                 $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->kode_peserta.'-'.$file->nomor).'.pdf';
                 $zip->addFile($disk->path($file->file_pdf), $name);
@@ -186,9 +186,8 @@ class SertifikatController extends Controller
             'PDF sertifikat tidak ditemukan.'
         );
 
-        if ($penerbit->sinkronkanDataLahir($sertifikat)) {
-            $penerbit->perbaruiPdf($sertifikat);
-        }
+        $penerbit->sinkronkanDataLahir($sertifikat);
+        $penerbit->perbaruiPdf($sertifikat);
 
         return $disk->response(
             $sertifikat->file_pdf,
