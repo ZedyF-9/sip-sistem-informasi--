@@ -43,10 +43,9 @@
         .signer-right .signature-line { left: 0; right: auto; margin-left: 0; }
         .signer-name { font-weight: bold; }
         .motto { position: absolute; left: 365pt; top: 425pt; width: 112pt; height: 120pt; object-fit: contain; }
-        .qr { position: absolute; right: 15pt; bottom: 14pt; width: 35pt; height: 35pt; }
-        .verification-code { position: absolute; right: 59pt; bottom: 20pt; width: 112pt; text-align: right; }
+        .verification-code { position: absolute; right: 18pt; bottom: 14pt; width: 150pt; text-align: right; }
         .verification-code-label { color: #52606d; font-size: 6.5pt; line-height: 9pt; }
-        .verification-code-value { color: #123957; font-size: 11pt; font-weight: bold; letter-spacing: 1pt; line-height: 13pt; }
+        .verification-code-value { color: #123957; font-size: 9.5pt; font-weight: bold; letter-spacing: .8pt; line-height: 12pt; opacity: .72; }
     </style>
 </head>
 <body>
@@ -115,8 +114,6 @@
                 <div class="verification-code-value">{{ $sertifikat->kode_cetak }}</div>
             </div>
         @endif
-
-        <img class="qr" src="{{ $qr }}" alt="QR menuju portal verifikasi sertifikat">
     </div>
 </body>
 </html>

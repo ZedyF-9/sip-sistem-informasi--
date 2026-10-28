@@ -6,10 +6,6 @@ use App\Models\Kegiatan;
 use App\Models\PesertaPkl;
 use App\Models\Sertifikat;
 use Carbon\CarbonImmutable;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -19,8 +15,6 @@ use Throwable;
 
 class PenerbitSertifikat
 {
-    private const VERIFICATION_URL_BASE = 'https://sip.tefa.smkn4tpi.sch.id/verifikasi-sertifikat/';
-
     public const PREDIKAT = [
         'BIASA' => 'Biasa',
         'BAIK' => 'Baik',
@@ -236,15 +230,6 @@ class PenerbitSertifikat
 
     private function renderPdf(Sertifikat $sertifikat): string
     {
-        $renderer = new ImageRenderer(
-            new RendererStyle(240, 4),
-            new SvgImageBackEnd()
-        );
-
-        $writer = new Writer($renderer);
-        $verificationUrl = self::VERIFICATION_URL_BASE.$sertifikat->kode_verifikasi;
-        $svg = $writer->writeString($verificationUrl);
-        $qr = 'data:image/svg+xml;base64,'.base64_encode($svg);
         $template = 'data:image/png;base64,'.base64_encode(file_get_contents(
             public_path(
                 'reference/serifikat/'
@@ -259,7 +244,6 @@ class PenerbitSertifikat
         return Pdf::loadView('sertifikat.pdf', [
             'sertifikat' => $sertifikat,
             'snapshot' => $sertifikat->snapshot,
-            'qr' => $qr,
             'template' => $template,
             'logoKepri' => $asset(
                 'Gambar ChatGPT 28 Sep 2026, 14.00.27-3.png'
