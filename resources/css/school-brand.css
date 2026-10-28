@@ -31,5 +31,5 @@
 .login-wordmark { color: var(--school-blue); }
 
 @media (max-width: 639px) {
-    .public-brand .school-logo { width: 52px; height: 52px; }
+    .public-brand .school-logo { width: 46px; height: 46px; }
 }

@@ -99,6 +99,9 @@
 .public-shell { background: #fff; }
 .public-nav-link { color: #535b63; }
 .public-nav-link:hover, .public-nav-link[aria-current='page'] { color: var(--school-blue-deep); background: var(--school-blue-soft); border-color: transparent; }
+.public-header-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.public-header-actions > form { margin: 0; }
+.public-header-actions .public-account-link { margin-left: 0; }
 .public-content .public-hero { background: none; border: 0; border-bottom: 1px solid var(--dashboard-line); border-radius: 0; box-shadow: none; padding: 38px 0 48px; min-height: 360px; gap: 64px; }
 .public-content h1 { color: var(--school-blue-deep); font-weight: 650; letter-spacing: -.9px; }
 .public-hero .dashboard-eyebrow { color: #626970; font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0; }
@@ -111,7 +114,7 @@
 .dashboard-section-heading h2 { font-size: 22px; font-weight: 650; letter-spacing: -.4px; }
 .public-content a.dashboard-quick-card { border: 0; border-bottom: 1px solid var(--dashboard-line); border-radius: 0; box-shadow: none; padding: 24px 0; background: #fff; }
 .public-content .dashboard-quick-card:hover { background: #fafafa; box-shadow: none; }
-.public-content .dashboard-quick-grid { column-gap: 32px; row-gap: 0; }
+.public-content .dashboard-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; row-gap: 0; }
 .public-content .dashboard-quick-card > .dashboard-icon { color: var(--school-blue); margin-bottom: 17px; }
 .public-content .dashboard-quick-card h2 { color: var(--school-blue-deep); font-size: 16px; }
 .public-content .dashboard-quick-card p { color: #626970; font-size: 13px; }
@@ -125,9 +128,66 @@
     .role-summary-stat:nth-child(2) { border-right: 0; }
     .role-summary-stat:nth-child(-n+2) { border-bottom: 1px solid var(--dashboard-line); }
 }
+@media (max-width: 1100px) {
+    .public-header-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "brand actions" "nav nav";
+        align-items: center;
+        gap: 0;
+        padding: 0 24px;
+    }
+    .public-brand { grid-area: brand; width: auto; min-height: 68px; margin: 0; border: 0; }
+    .public-nav {
+        grid-area: nav;
+        width: auto;
+        flex-wrap: nowrap;
+        gap: 5px;
+        padding: 7px 0;
+        border-top: 1px solid var(--dashboard-line);
+    }
+    .public-header-actions { grid-area: actions; }
+}
 @media (max-width: 767px) {
-    .public-content .public-hero { gap: 32px; padding: 20px 0 32px; }
-    .public-guide { padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--dashboard-line); }
+    .public-content { padding-top: 20px; }
+    .public-content .public-hero {
+        min-height: 0;
+        gap: 22px;
+        padding: 18px 0 28px;
+    }
+    .public-content .public-hero h1 {
+        max-width: 19ch;
+        margin-top: 13px;
+        font-size: clamp(28px, 7vw, 34px);
+        line-height: 1.15;
+        letter-spacing: -.75px;
+    }
+    .public-hero .dashboard-hero-description { margin-top: 14px; font-size: 14px; }
+    .public-guide {
+        padding: 18px;
+        border: 1px solid #e7eaed;
+        border-radius: 10px;
+        background: #f6f7f8;
+    }
+    .public-guide h2 { margin-bottom: 16px; }
+    .public-guide ol { gap: 14px; }
+    .public-content .dashboard-section-heading { margin: 26px 0 10px; }
+    .public-content .dashboard-quick-grid { grid-template-columns: minmax(0, 1fr); }
+    .public-content a.dashboard-quick-card {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr);
+        grid-template-areas: "icon title" ". description" ". action";
+        column-gap: 12px;
+        row-gap: 3px;
+        padding: 18px 0;
+    }
+    .public-content .dashboard-quick-card > .dashboard-icon { grid-area: icon; margin: 2px 0 0; }
+    .public-content .dashboard-quick-card h2 { grid-area: title; align-self: center; }
+    .public-content .dashboard-quick-card p { grid-area: description; margin-top: 3px; }
+    .public-content .dashboard-quick-card > span { grid-area: action; padding-top: 5px; margin-top: 5px; }
+    .public-content article.rounded-2xl { padding: 20px; }
+    .public-content > .mx-auto > section.rounded-2xl { padding: 20px; }
+    .public-content form.rounded-2xl > button { width: 100%; min-height: 48px; }
 }
 @media (max-width: 639px) {
     .dashboard-page-heading h1 { font-size: 16px; }
@@ -135,5 +195,21 @@
     .role-summary-stat p { font-size: 12px; }
     .role-summary-ring { width: auto; height: auto; border: 0; }
     .role-summary-pulse { padding: 20px 0; }
-    .public-content a.dashboard-quick-card { padding: 22px 0; }
+    .public-header-inner { padding-inline: 16px; }
+    .public-brand { min-height: 60px; gap: 8px; }
+    .public-brand > span { min-width: 0; }
+    .public-brand strong { font-size: 14px; }
+    .public-brand small { font-size: 10px; letter-spacing: .1px; white-space: nowrap; }
+    .public-header-actions { gap: 5px; }
+    .public-header-actions .public-account-link { min-height: 38px; padding: 7px 9px; font-size: 11px; }
+    .public-header-actions .dashboard-logout { min-height: 38px; padding: 7px 9px; font-size: 11px; }
+    .public-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 6px 0; }
+    .public-nav-link { min-height: 42px; padding: 6px 4px; font-size: 11px; line-height: 1.25; text-align: center; white-space: normal; }
+    .public-content { padding: 18px 16px 36px; }
+    .public-content .public-hero { padding-bottom: 24px; }
+    .public-guide { padding: 16px; }
+    .public-content .dashboard-quick-grid { row-gap: 0; }
+    .public-content a.dashboard-quick-card { padding: 17px 0; }
+    .public-content article.rounded-2xl { padding: 18px; }
+    .public-content > .mx-auto > section.rounded-2xl { padding: 18px; }
 }

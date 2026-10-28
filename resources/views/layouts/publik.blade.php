@@ -31,27 +31,19 @@
                         {{ $label }}
                     </a>
                 @endforeach
+            </nav>
 
+            <div class="public-header-actions">
                 @auth
-                    <a
-                        href="{{ route('dashboard') }}"
-                        class="public-account-link"
-                    >
-                        Dashboard
-                    </a>
+                    <a href="{{ route('dashboard') }}" class="public-account-link">Dashboard</a>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="dashboard-logout">Keluar</button>
                     </form>
                 @else
-                    <a
-                        href="{{ route('login') }}"
-                        class="public-account-link"
-                    >
-                        Login Internal
-                    </a>
+                    <a href="{{ route('login') }}" class="public-account-link">Login Internal</a>
                 @endauth
-            </nav>
+            </div>
         </div>
     </header>
 
