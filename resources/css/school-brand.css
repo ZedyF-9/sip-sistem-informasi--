@@ -34,3 +34,7 @@
     .public-brand .school-logo { width: 46px; height: 46px; }
     .public-content .public-hero { border-bottom-width: 1px; }
 }
+
+@media (max-width: 359px) {
+    .public-brand .school-logo { width: 40px; height: 40px; }
+}

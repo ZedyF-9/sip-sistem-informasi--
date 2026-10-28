@@ -17,7 +17,8 @@
 }
 .dashboard-shell .dashboard-icon { width: 19px; height: 19px; flex: 0 0 auto; }
 .dashboard-shell :where(a, button, input, select, textarea, summary) {
-    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 180ms cubic-bezier(.2, .8, .2, 1), filter 180ms ease;
 }
 .dashboard-shell :where(a, button, input, select, textarea, summary):focus-visible {
     outline: 3px solid #829dff;
@@ -115,7 +116,14 @@
 .dashboard-logout:active,
 .dashboard-nav-toggle:active,
 .dashboard-nav-close:active,
-.dashboard-content :where(a, button)[class*='rounded-']:active { transform: translateY(1px); }
+.dashboard-content :where(a, button)[class*='rounded-']:active,
+.dashboard-shell button:active:not(:disabled),
+.dashboard-shell [role='button']:active:not([aria-disabled='true']) { transform: scale(.97); filter: brightness(.96); }
+.dashboard-shell :where(a, button, [role='button'], summary):active:not(:disabled) { filter: brightness(.96); }
+.dashboard-shell .dashboard-nav a:active,
+.public-shell .public-nav-link:active,
+.public-shell .public-account-link:active { transform: scale(.97); }
+.public-shell .dashboard-quick-card:active { transform: scale(.99); }
 .dashboard-content { width: 100%; max-width: 1440px; margin-inline: auto; padding: 34px 32px 48px; }
 .dashboard-content > :where(section, form, div).bg-white,
 .dashboard-content :where(section, form).rounded-2xl.bg-white,
@@ -354,6 +362,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
     .dashboard-shell *, .dashboard-shell *::before { transition: none !important; scroll-behavior: auto !important; }
+    .dashboard-shell :where(a, button, [role='button'], summary):active { transform: none !important; filter: none !important; }
 }
 @media print {
     .dashboard-print-tools { display: none !important; }

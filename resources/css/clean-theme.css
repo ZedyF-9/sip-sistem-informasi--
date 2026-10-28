@@ -146,7 +146,7 @@
         padding: 7px 0;
         border-top: 1px solid var(--dashboard-line);
     }
-    .public-header-actions { grid-area: actions; }
+    .public-header-actions { grid-area: actions; align-self: center; justify-self: end; }
 }
 @media (max-width: 767px) {
     .public-content { padding-top: 20px; }
@@ -226,6 +226,9 @@
     .public-content > .mx-auto > section.rounded-2xl { padding: 18px; }
 }
 @media (max-width: 359px) {
-    .public-header-inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "actions" "nav"; }
-    .public-header-actions { justify-self: end; padding-block: 2px 6px; }
+    .public-brand { gap: 6px; }
+    .public-brand strong { font-size: 13px; }
+    .public-brand small { font-size: 9px; letter-spacing: 0; }
+    .public-header-actions .public-account-link { min-width: 90px; padding-inline: 6px; font-size: 10px; }
+    .public-header-actions .dashboard-logout { padding-inline: 7px; font-size: 10px; }
 }
