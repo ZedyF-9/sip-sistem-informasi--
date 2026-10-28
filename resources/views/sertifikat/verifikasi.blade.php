@@ -7,7 +7,7 @@
         <h1 class="text-3xl font-bold text-blue-950">Verifikasi Sertifikat</h1>
 
         <p class="mt-3 text-slate-600">
-            Masukkan kode angka 8 digit yang tercetak pada sertifikat atau pindai QR Code.
+            Masukkan kode angka 8 digit yang tercetak pada sertifikat.
         </p>
 
         @if ($errors->any())

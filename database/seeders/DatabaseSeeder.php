@@ -12,33 +12,58 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-      $daftarAkun = [
-    [
-        'name' => 'Koordinator TU',
-        'email' => 'tu@smkn4.com',
-        'role' => 'koordinator_tu',
-    ],
-    [
-        'name' => 'Kepala TU',
-        'email' => 'kepala_tu@smkn4.com',
-        'role' => 'kepala_tu',
-    ],
-    [
-        'name' => 'Kepala Sekolah',
-        'email' => 'kepala_sekolah@smkn4.com',
-        'role' => 'kepala_sekolah',
-    ],
-    [
-        'name' => 'Penerima Disposisi',
-        'email' => 'penerima_disposisi@smkn4.com',
-        'role' => 'penerima_disposisi',
-    ],
-    [
-        'name' => 'Waka Humas',
-        'email' => 'waka_humas@smkn4.com',
-        'role' => 'waka_humas',
-    ],
-];
+        $daftarAkun = [
+            [
+                'name' => 'Koordinator TU',
+                'email' => 'tu@smkn4.com',
+                'role' => 'koordinator_tu',
+            ],
+            [
+                'name' => 'Kepala TU',
+                'email' => 'kepala_tu@smkn4.com',
+                'role' => 'kepala_tu',
+            ],
+            [
+                'name' => 'Kepala Sekolah',
+                'email' => 'kepala_sekolah@smkn4.com',
+                'role' => 'kepala_sekolah',
+            ],
+            [
+                'name' => 'Waka Kurikulum',
+                'email' => 'waka_kurikulum@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+            [
+                'name' => 'Waka Kesiswaan',
+                'email' => 'waka_kesiswaan@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+            [
+                'name' => 'Waka Sapras',
+                'email' => 'waka_sapras@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+            [
+                'name' => 'Waka Humas',
+                'email' => 'waka_humas@smkn4.com',
+                'role' => 'waka_humas',
+            ],
+            [
+                'name' => 'Pembina OSIS',
+                'email' => 'pembina_osis@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+            [
+                'name' => 'Bendahara BOS',
+                'email' => 'bendahara_bos@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+            [
+                'name' => 'Bendahara SPP',
+                'email' => 'bendahara_spp@smkn4.com',
+                'role' => 'penerima_disposisi',
+            ],
+        ];
 
         // Pastikan semua role dikenali oleh sistem login.
         foreach ($daftarAkun as $data) {
