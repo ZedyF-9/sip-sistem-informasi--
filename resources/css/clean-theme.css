@@ -196,7 +196,7 @@
     .role-summary-ring { width: auto; height: auto; border: 0; }
     .role-summary-pulse { padding: 20px 0; }
     .public-header-inner { padding-inline: 16px; }
-    .public-brand { min-height: 60px; gap: 8px; }
+    .public-brand { min-width: 0; min-height: 60px; gap: 8px; }
     .public-brand > span { min-width: 0; }
     .public-brand strong { font-size: 14px; }
     .public-brand small { font-size: 10px; letter-spacing: .1px; white-space: nowrap; }
@@ -205,8 +205,9 @@
     .public-header-actions .dashboard-logout { min-height: 38px; padding: 7px 9px; font-size: 11px; }
     .public-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 6px 0; }
     .public-nav-link { min-height: 42px; padding: 6px 4px; font-size: 11px; line-height: 1.25; text-align: center; white-space: normal; }
-    .public-content { padding: 18px 16px 36px; }
-    .public-content .public-hero { padding-bottom: 24px; }
+    .public-content { padding: 12px 16px 30px; }
+    .public-content .public-hero { padding-top: 8px; padding-bottom: 20px; }
+    .public-content .dashboard-section-heading { margin: 20px 0 8px; }
     .public-guide { padding: 16px; }
     .public-content .dashboard-quick-grid { row-gap: 0; }
     .public-content a.dashboard-quick-card { padding: 17px 0; }
