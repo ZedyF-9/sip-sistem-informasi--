@@ -7,7 +7,7 @@
         <a href="{{ route('tu.kegiatan.index') }}" class="rounded-xl border border-slate-300 bg-white px-5 py-3">Kembali ke daftar PKL</a>
         @if ($counts['sertifikat'] > 0)
             <a href="{{ route('tu.kegiatan.sertifikat.zip', $kegiatan) }}"
-               class="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Unduh Semua Sertifikat (ZIP)</a>
+               class="dashboard-action-button dashboard-action-manage">Unduh Semua Sertifikat (ZIP)</a>
         @endif
     </div>
 
@@ -19,7 +19,7 @@
                 @if ($kegiatan->deskripsi)<p class="mt-3 whitespace-pre-line text-sm text-slate-600">{{ $kegiatan->deskripsi }}</p>@endif
             </div>
             @if ($counts['peserta'] === 0)
-                <a href="{{ route('tu.kegiatan.edit', $kegiatan) }}" class="rounded-xl border border-slate-300 px-4 py-2">Edit Periode</a>
+                <a href="{{ route('tu.kegiatan.edit', $kegiatan) }}" class="dashboard-action-button dashboard-action-manage">Edit Periode</a>
             @endif
         </div>
         <div class="mt-5 grid gap-3 sm:grid-cols-3">
@@ -153,7 +153,7 @@
                         <option value="" selected disabled>Pilih kelas</option>
                         @foreach ($semuaKelas as $namaKelas)<option value="{{ $namaKelas }}">{{ $namaKelas }}</option>@endforeach
                     </select>
-                    <button class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white" @disabled($semuaKelas->isEmpty())>Tandai semua siswa selesai</button>
+                    <button class="dashboard-action-button dashboard-action-manage" @disabled($semuaKelas->isEmpty())>Tandai semua siswa selesai</button>
                 </div>
                 <p class="mt-2 text-xs text-slate-500">Pilih kelas, lalu klik tombol untuk mengubah status semua siswa yang masih berlangsung di kelas itu menjadi selesai.</p>
             </form>
@@ -178,7 +178,7 @@
                             <option value="{{ $namaKelas }}">{{ $namaKelas }}</option>
                         @endforeach
                     </select>
-                    <button class="shrink-0 rounded-lg bg-emerald-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-800 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" @disabled(! $kegiatan->tanggal_selesai->isPast() || $kelasList->isEmpty())>
+                    <button class="dashboard-action-button dashboard-action-manage shrink-0 disabled:cursor-not-allowed disabled:opacity-50" @disabled(! $kegiatan->tanggal_selesai->isPast() || $kelasList->isEmpty())>
                         Terbitkan kelas
                     </button>
                 </div>
@@ -198,7 +198,7 @@
                             <option value="{{ $namaKelas }}">{{ $namaKelas }}</option>
                         @endforeach
                     </select>
-                    <button class="shrink-0 rounded-lg border border-blue-800 px-4 py-2.5 text-sm font-semibold text-blue-900 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-800 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" @disabled($kelasSertifikatList->isEmpty())>
+                    <button class="dashboard-action-button dashboard-action-manage shrink-0 disabled:cursor-not-allowed disabled:opacity-50" @disabled($kelasSertifikatList->isEmpty())>
                         Unduh ZIP kelas
                     </button>
                 </div>
@@ -228,9 +228,10 @@
                         <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status }}">{{ ucfirst($item->status) }}</span></td>
                         <td class="p-4">
                             @if ($item->sertifikat?->status === 'aktif')
-                                <a href="{{ route('tu.sertifikat.download', $item->sertifikat) }}" class="font-semibold text-blue-700">Lihat PDF</a>
-                                <span class="mx-1 text-slate-300">·</span>
-                                <a href="{{ route('publik.sertifikat.hasil', $item->sertifikat->kode_verifikasi) }}" target="_blank" rel="noopener" class="text-blue-700">Verifikasi</a>
+                                <div class="dashboard-row-actions">
+                                    <a href="{{ route('tu.sertifikat.download', $item->sertifikat) }}" class="dashboard-action-button dashboard-action-manage">Lihat PDF</a>
+                                    <a href="{{ route('publik.sertifikat.hasil', $item->sertifikat->kode_verifikasi) }}" target="_blank" rel="noopener" class="dashboard-action-button dashboard-action-manage">Verifikasi</a>
+                                </div>
                             @elseif ($item->status === 'selesai' && $kegiatan->tanggal_selesai->isPast())
                                 <form action="{{ route('tu.sertifikat.store', [$kegiatan, $item]) }}" method="POST" class="flex flex-col items-start gap-2">
                                     @csrf
@@ -241,7 +242,7 @@
                                             <option value="{{ $value }}" @selected(old('predikat') === $value)>{{ $label }}</option>
                                         @endforeach
                                     </select>
-                                    <button class="font-semibold text-blue-700">Terbitkan Sertifikat</button>
+                                    <button class="dashboard-action-button dashboard-action-manage">Terbitkan Sertifikat</button>
                                 </form>
                             @else
                                 <span class="text-slate-400">Belum siap</span>
@@ -251,7 +252,7 @@
                                 <form action="{{ route('tu.kegiatan.peserta.complete', [$kegiatan, $item]) }}" method="POST" class="mt-2">
                                     @csrf
                                     @method('PATCH')
-                                    <button class="text-xs font-semibold text-emerald-700">Tandai PKL selesai</button>
+                                    <button class="dashboard-action-button dashboard-action-manage">Tandai PKL selesai</button>
                                 </form>
                             @endif
 

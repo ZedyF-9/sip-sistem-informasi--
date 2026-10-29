@@ -23,7 +23,7 @@
             @if ($surat->catatan_persetujuan)
                 <p class="mt-2 whitespace-pre-line">{{ $surat->catatan_persetujuan }}</p>
             @endif
-            <a href="{{ route('surat-keluar.edit', $surat) }}" class="mt-3 inline-flex rounded-lg bg-amber-700 px-4 py-2 font-semibold text-white">Edit surat revisi</a>
+            <a href="{{ route('surat-keluar.edit', $surat) }}" class="dashboard-action-button dashboard-action-manage mt-3">Edit surat revisi</a>
         </div>
     @endif
 

@@ -47,13 +47,17 @@
                         {{ \Illuminate\Support\Str::limit($item->deskripsi, 170) }}
                     </p>
                     <a href="{{ route('publik.mitra.show', $item->id) }}"
-                       class="mt-5 inline-block font-semibold text-blue-700">
+                       class="public-action-button mt-5">
                         Lihat profil →
                     </a>
                 </article>
             @empty
                 <p class="rounded-xl bg-white p-8 text-slate-500 md:col-span-2 lg:col-span-3">
-                    Belum ada mitra yang sesuai.
+                    @if ($q !== '')
+                        Belum ada mitra yang sesuai dengan pencarian ini.
+                    @else
+                        Belum ada mitra industri yang bekerja sama.
+                    @endif
                 </p>
             @endforelse
         </div>

@@ -23,14 +23,13 @@
                 Password Lama
             </label>
 
-            <input
+            <x-password-input
                 id="current_password"
                 name="current_password"
-                type="password"
                 autocomplete="current-password"
                 required
                 class="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
+            />
         </div>
 
         <div>
@@ -38,19 +37,20 @@
                 Password Baru
             </label>
 
-            <input
+            <x-password-input
                 id="password"
                 name="password"
-                type="password"
                 autocomplete="new-password"
                 minlength="12"
                 maxlength="72"
                 required
                 class="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
+            />
+
+            <x-password-strength for="password" />
 
             <p class="mt-2 text-sm text-slate-500">
-                Minimal 12 karakter dan berbeda dari password lama.
+                Password baru harus berbeda dari password lama.
             </p>
         </div>
 
@@ -59,16 +59,15 @@
                 Ulangi Password Baru
             </label>
 
-            <input
+            <x-password-input
                 id="password_confirmation"
                 name="password_confirmation"
-                type="password"
                 autocomplete="new-password"
                 minlength="12"
                 maxlength="72"
                 required
                 class="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
+            />
         </div>
 
         <p class="text-sm text-slate-500">

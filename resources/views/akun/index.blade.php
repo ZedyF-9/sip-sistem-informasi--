@@ -89,22 +89,22 @@
                             @if ((int) $akun->id === (int) auth()->id())
                                 <a
                                     href="{{ route('profil.password.edit') }}"
-                                    class="font-semibold text-blue-700 hover:underline"
+                                    class="dashboard-action-button dashboard-action-manage"
                                 >
                                     Password Saya
                                 </a>
                             @else
-                                <div class="flex flex-wrap gap-4">
+                                <div class="dashboard-row-actions">
                                     <a
                                         href="{{ route('tu.akun.edit', $akun) }}"
-                                        class="font-semibold text-blue-700 hover:underline"
+                                        class="dashboard-action-button dashboard-action-manage"
                                     >
                                         Edit
                                     </a>
 
                                     <a
                                         href="{{ route('tu.akun.password.edit', $akun) }}"
-                                        class="font-semibold text-amber-700 hover:underline"
+                                        class="dashboard-action-button dashboard-action-manage"
                                     >
                                         Reset Password
                                     </a>

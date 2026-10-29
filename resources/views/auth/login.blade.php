@@ -42,9 +42,9 @@
 
                 <div class="login-field">
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password"
-                           autocomplete="current-password" maxlength="72" required
-                           @if ($errors->has('password')) aria-invalid="true" aria-describedby="password-error" @endif>
+                    <x-password-input id="password" name="password"
+                                      autocomplete="current-password" maxlength="72" required
+                                      :invalid="$errors->has('password')" />
                     @error('password')
                         <p id="password-error" role="alert" class="login-error">{{ $message }}</p>
                     @enderror

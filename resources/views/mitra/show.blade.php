@@ -7,7 +7,7 @@
         <a href="{{ route('tu.mitra.index') }}"
            class="rounded-xl border bg-white px-5 py-3">Kembali</a>
         <a href="{{ route('tu.mitra.edit', $mitra) }}"
-           class="rounded-xl bg-blue-700 px-5 py-3 text-white">Edit Mitra</a>
+           class="dashboard-action-button dashboard-action-manage">Edit Mitra</a>
         <x-hapus-data :action="route('tu.mitra.destroy', $mitra)" :label="$mitra->nama_mitra"
             :message="'Hapus mitra '.$mitra->nama_mitra.'? Semua agenda, kerja sama lama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
 

@@ -74,12 +74,14 @@
                             } }}
                         </td>
                         <td class="p-4">
+                            <div class="dashboard-row-actions">
                             <a href="{{ route('surat-keluar.show', $item) }}"
-                               class="font-semibold text-blue-700">Detail</a>
+                               class="dashboard-action-button dashboard-action-detail">Detail</a>
                             @if (auth()->user()->role === 'koordinator_tu')
                                 <x-hapus-data :action="route('surat-keluar.destroy', $item)" :label="$item->perihal"
                                     :message="'Hapus surat keluar '.$item->perihal.'? Riwayat dan berkas terkait ikut dihapus permanen.'" />
                             @endif
+                            </div>
                         </td>
                     </tr>
                 @empty

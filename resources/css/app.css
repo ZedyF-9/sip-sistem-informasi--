@@ -4,6 +4,8 @@
 @import './clean-theme.css';
 @import './login.css';
 @import './school-brand.css';
+@import './password-visibility.css';
+@import './password-strength.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

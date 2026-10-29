@@ -10,6 +10,19 @@
             Masukkan kode angka 8 digit yang tercetak pada sertifikat.
         </p>
 
+        <aside class="public-notice mt-6 rounded-xl p-5" aria-labelledby="panduan-verifikasi">
+            <h2 id="panduan-verifikasi" class="font-bold text-blue-950">Panduan verifikasi</h2>
+            <p class="mt-2 text-sm leading-6">
+                Cari label <strong>Kode Verifikasi</strong> di sudut kanan bawah sertifikat, lalu masukkan 8 angka di bawahnya.
+            </p>
+            <p class="mt-3 text-sm leading-6">
+                Jika sertifikat aktif, hasil menampilkan nomor sertifikat, nama, kegiatan, peran, predikat, tempat dan tanggal lahir, industri PKL, kelas, jurusan, serta tanggal terbit (sesuai data yang tersedia). Cocokkan informasi itu dengan sertifikat.
+            </p>
+            <p class="mt-3 text-sm leading-6">
+                Jika sertifikat dicabut, halaman memberi tahu bahwa sertifikat tidak berlaku. Jika kode tidak ditemukan, periksa kembali angka yang dimasukkan.
+            </p>
+        </aside>
+
         @if ($errors->any())
             <div class="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">
                 {{ $errors->first() }}

@@ -80,12 +80,14 @@
                         <td class="p-4">{{ $surat->keterangan ?: '—' }}</td>
 
                         <td class="p-4">
+                            <div class="dashboard-row-actions">
                             <a href="{{ route('tu.surat-masuk.show', $surat) }}"
-                               class="font-semibold text-blue-700 hover:underline">
+                               class="dashboard-action-button dashboard-action-detail">
                                 Detail
                             </a>
                             <x-hapus-data :action="route('tu.surat-masuk.destroy', $surat)" :label="$surat->perihal"
                                 :message="'Hapus surat masuk '.$surat->nomor_registrasi.'? Semua disposisi, tindak lanjut, riwayat, dan berkas terkait ikut dihapus permanen.'" />
+                            </div>
                         </td>
                     </tr>
                 @empty

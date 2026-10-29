@@ -61,17 +61,19 @@
                         <td class="p-4">{{ $kegiatan->sertifikats_count }}</td>
 
                         <td class="p-4">
-                            <a
-                                href="{{ route('tu.kegiatan.show', $kegiatan) }}"
-                                class="font-semibold text-blue-700"
-                            >
-                                Kelola
-                            </a>
-                            <x-hapus-data
-                                :action="route('tu.kegiatan.destroy', $kegiatan)"
-                                :label="$kegiatan->nama"
-                                :message="'Yakin menghapus sesi PKL '.$kegiatan->nama.'? '.$kegiatan->peserta_pkls_count.' data siswa, '.$kegiatan->sertifikats_count.' sertifikat, dan PDF terkait akan dihapus permanen. Tautan verifikasi QR tidak akan berlaku lagi.'"
-                            />
+                            <div class="dashboard-row-actions">
+                                <a
+                                    href="{{ route('tu.kegiatan.show', $kegiatan) }}"
+                                    class="dashboard-action-button dashboard-action-manage"
+                                >
+                                    Kelola
+                                </a>
+                                <x-hapus-data
+                                    :action="route('tu.kegiatan.destroy', $kegiatan)"
+                                    :label="$kegiatan->nama"
+                                    :message="'Yakin menghapus sesi PKL '.$kegiatan->nama.'? '.$kegiatan->peserta_pkls_count.' data siswa, '.$kegiatan->sertifikats_count.' sertifikat, dan PDF terkait akan dihapus permanen. Tautan verifikasi QR tidak akan berlaku lagi.'"
+                                />
+                            </div>
                         </td>
                     </tr>
                 @empty

@@ -36,10 +36,12 @@
                         <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan }}">{{ ucfirst($item->status_persetujuan) }}</span></td>
                         <td class="p-4">{{ $item->agendas_count }}</td>
                         <td class="p-4">
+                            <div class="dashboard-row-actions">
                             <a href="{{ route('tu.mitra.show', $item) }}"
-                               class="font-semibold text-blue-700">Detail</a>
+                               class="dashboard-action-button dashboard-action-detail">Detail</a>
                             <x-hapus-data :action="route('tu.mitra.destroy', $item)" :label="$item->nama_mitra"
                                 :message="'Hapus mitra '.$item->nama_mitra.'? Semua agenda, kerja sama lama, logo, dan dokumen MoU terkait ikut dihapus permanen.'" />
+                            </div>
                         </td>
                     </tr>
                 @empty

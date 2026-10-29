@@ -28,7 +28,7 @@
 
         @if (auth()->user()->role === 'koordinator_tu')
             <a href="{{ route('disposisi.create') }}"
-               class="dashboard-button-create rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">
+               class="dashboard-action-button dashboard-action-manage">
                 + Buat Disposisi
             </a>
         @endif
@@ -49,7 +49,7 @@
                             <td class="p-4">{{ $surat->tanggal_diterima->format('d/m/Y') }}</td>
                             <td class="p-4">{{ $surat->asal_surat }}</td>
                             <td class="p-4">{{ $surat->perihal }}</td>
-                            <td class="p-4"><a class="font-semibold text-blue-700" href="{{ route('disposisi.create', ['surat_masuk_id' => $surat->id]) }}">Buat disposisi</a></td>
+                            <td class="p-4"><a class="dashboard-action-button dashboard-action-manage" href="{{ route('disposisi.create', ['surat_masuk_id' => $surat->id]) }}">Buat disposisi</a></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -93,14 +93,16 @@
                         </td>
                         <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan === 'menunggu' ? 'baru' : $item->status }}">{{ $item->penerima->role === 'kepala_sekolah' ? ($item->status_persetujuan === 'menunggu' ? 'Menunggu tinjauan Kepsek' : 'Disetujui, menunggu disposisi Kepsek') : ucfirst($item->status) }}</span></td>
                         <td class="p-4">
+                            <div class="dashboard-row-actions">
                             <a href="{{ route('disposisi.show', $item) }}"
-                               class="font-semibold text-blue-700">
+                               class="dashboard-action-button dashboard-action-detail">
                                 Detail
                             </a>
                             @if (in_array(auth()->user()->role, ['koordinator_tu', 'kepala_sekolah'], true))
                                 <x-hapus-data :action="route('disposisi.destroy', $item)" :label="'disposisi #'.$item->id"
                                     :message="'Hapus disposisi untuk '.$item->penerima->name.'? Tindak lanjut dan lampirannya ikut dihapus permanen.'" />
                             @endif
+                            </div>
                         </td>
                     </tr>
                 @empty

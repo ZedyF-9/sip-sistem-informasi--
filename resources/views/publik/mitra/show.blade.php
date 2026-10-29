@@ -5,7 +5,7 @@
 @section('content')
     <div class="mx-auto max-w-4xl px-6 py-12">
         <a href="{{ route('publik.mitra.index') }}"
-           class="font-semibold text-blue-700">← Semua Mitra</a>
+           class="public-action-button public-action-button-secondary">← Semua Mitra</a>
 
         <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-8">
             @if ($mitra->logo)
@@ -20,7 +20,7 @@
 
             @if ($mitra->website && preg_match('/^https?:\/\//i', $mitra->website))
                 <a href="{{ $mitra->website }}" target="_blank" rel="noopener noreferrer"
-                   class="mt-6 inline-block rounded-xl bg-blue-700 px-5 py-3 text-white">
+                   class="public-action-button mt-6">
                     Kunjungi Website Mitra
                 </a>
             @endif

@@ -31,11 +31,13 @@
                             <td class="p-4">{{ $item->tanggal_disposisi?->format('d/m/Y') ?? '—' }}</td>
                             <td class="p-4"><span class="dashboard-badge" data-status="{{ $item->status_persetujuan === 'ditolak' ? 'ditolak' : 'selesai' }}">{{ $item->status_persetujuan === 'ditolak' ? 'Ditolak Kepala Sekolah' : ($item->status_persetujuan === 'diteruskan' ? 'Diteruskan oleh Kepala Sekolah' : 'Selesai') }}</span></td>
                             <td class="p-4">
-                                <a href="{{ route('disposisi.show', $item) }}" class="font-semibold text-blue-700">Detail</a>
+                                <div class="dashboard-row-actions">
+                                <a href="{{ route('disposisi.show', $item) }}" class="dashboard-action-button dashboard-action-detail">Detail</a>
                                 @if (in_array(auth()->user()->role, ['koordinator_tu', 'kepala_sekolah'], true))
                                     <x-hapus-data :action="route('disposisi.destroy', $item)" :label="'disposisi #'.$item->id"
                                         :message="'Hapus disposisi untuk '.$item->penerima->name.'? Tindak lanjut dan lampirannya ikut dihapus permanen.'" />
                                 @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

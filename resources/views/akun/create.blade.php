@@ -73,19 +73,20 @@
                 Password Awal
             </label>
 
-            <input
+            <x-password-input
                 id="password"
                 name="password"
-                type="password"
                 autocomplete="new-password"
                 minlength="12"
                 maxlength="72"
                 required
                 class="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
+            />
+
+            <x-password-strength for="password" />
 
             <p class="mt-2 text-sm text-slate-500">
-                Minimal 12 karakter. Akun baru langsung aktif.
+                Akun baru langsung aktif.
             </p>
         </div>
 
@@ -94,16 +95,15 @@
                 Ulangi Password Awal
             </label>
 
-            <input
+            <x-password-input
                 id="password_confirmation"
                 name="password_confirmation"
-                type="password"
                 autocomplete="new-password"
                 minlength="12"
                 maxlength="72"
                 required
                 class="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
+            />
         </div>
 
         <div class="flex flex-wrap gap-3 pt-3">
