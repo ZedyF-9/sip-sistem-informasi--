@@ -145,7 +145,10 @@ composer install
 npm install
 php artisan migrate
 npm run build
+php artisan optimize:clear
 ```
+
+`public/build` tidak disimpan di Git. Jalankan `npm run build` di server setiap kali pull mengubah CSS atau JavaScript. Jika tampilan masih memakai kode lama setelah cache dibersihkan, muat ulang PHP-FPM/server aplikasi dan lakukan hard refresh browser.
 
 Lalu mulai server dengan `php artisan serve`. Tidak perlu membuat ulang `APP_KEY` atau akun jika keduanya sudah ada. Perintah migrasi menambahkan perubahan struktur database tanpa menghapus data yang sudah tersimpan.
 
@@ -161,7 +164,7 @@ PDF surat, dokumen kerja sama, lampiran tindak lanjut, serta berkas sertifikat d
 
 - **SQLite tidak ditemukan:** pastikan `database/database.sqlite` sudah dibuat, lalu jalankan `php artisan migrate`.
 - **Login ditolak:** periksa email, password, dan status akun. Pada lingkungan lokal, `php artisan sip:reset-password` dapat menetapkan password baru bagi semua akun internal.
-- **Tampilan gagal dimuat setelah pull:** jalankan kembali `npm install` dan `npm run build`.
+- **Tampilan gagal dimuat setelah pull:** jalankan kembali `npm install`, `npm run build`, dan `php artisan optimize:clear`. Jika masih lama, muat ulang PHP-FPM/server aplikasi lalu hard refresh browser.
 - **Impor Excel atau unggahan gagal:** pastikan PHP mengizinkan ukuran unggah yang cukup. Batas PDF surat masuk adalah 5 MB dan berkas Excel 10 MB.
 
 ## Teknologi
